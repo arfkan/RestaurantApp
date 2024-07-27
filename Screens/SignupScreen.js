@@ -1,27 +1,76 @@
-import { StyleSheet, Text, View, TextInput, Dimensions, TouchableOpacity, ImageBackground } from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, View, TextInput, Dimensions, TouchableOpacity, ImageBackground, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { AntDesign } from '@expo/vector-icons';
+import { firebase } from '../firebase';
 
 const { width, height } = Dimensions.get('window');
 
 export default function SignupScreen({ navigation }) {
-  return (
-    <ImageBackground source={require('../assets/images/authimages.jpg')} style={styles.backgroundImage}>
-      <View style={styles.container}>
-        <View style={styles.rectangle}>
-          <AntDesign name="addusergroup" size={50} color="black" style={styles.icon} />
-          <TextInput style={styles.input} placeholder='Kullanıcı Adı' />
-          <TextInput style={styles.input} placeholder='E-posta' />
-          <TextInput style={styles.input} placeholder='telefon numarası' />
-          <TextInput style={styles.input} placeholder='şifre oluştur' secureTextEntry />
-          <TextInput style={styles.input} placeholder='şifreyi tekrar giriniz' secureTextEntry />
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Auth')}>
-            <Text style={styles.buttonText}>Kaydol</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ImageBackground>
-  );
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordsMatch, setPasswordsMatch] = useState(true);
+
+    useEffect(() => {
+        if (password && confirmPassword) {
+            if (password !== confirmPassword) {
+                setPasswordsMatch(false);
+            } else {
+                setPasswordsMatch(true);
+            }
+        }
+    }, [password, confirmPassword]);
+
+    const handleSignup = () => {
+        if (!passwordsMatch) {
+            alert('Şifreler uyuşmuyor!');
+            return;
+        }
+
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                // Signup successful
+                navigation.navigate('Auth');
+            })
+            .catch((error) => {
+                console.error(error);
+                alert('Kayıt başarısız. Lütfen bilgilerinizi kontrol edin.');
+            });
+    };
+
+    return (
+        <ImageBackground source={require('../assets/images/authimages.jpg')} style={styles.backgroundImage}>
+            <View style={styles.container}>
+                <View style={styles.rectangle}>
+                    <AntDesign name="addusergroup" size={50} color="black" style={styles.icon} />
+                    <TextInput 
+                        style={styles.input} 
+                        placeholder='E-posta' 
+                        value={email} 
+                        onChangeText={setEmail} 
+                    />
+                    <TextInput 
+                        style={styles.input} 
+                        placeholder='Şifre oluştur' 
+                        secureTextEntry 
+                        value={password} 
+                        onChangeText={setPassword} 
+                    />
+                    <TextInput 
+                        style={[styles.input, !passwordsMatch && styles.inputError]} 
+                        placeholder='Şifreyi tekrar giriniz' 
+                        secureTextEntry 
+                        value={confirmPassword} 
+                        onChangeText={setConfirmPassword} 
+                    />
+                    {!passwordsMatch && <Text style={styles.errorText}>Şifreler uyuşmuyor!</Text>}
+                    <TouchableOpacity style={styles.button} onPress={handleSignup}>
+                        <Text style={styles.buttonText}>Kaydol</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </ImageBackground>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -95,4 +144,12 @@ const styles = StyleSheet.create({
     color: '#4169E1',
     fontWeight: 'bold',
   },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+},
+inputError: {
+  borderColor: 'red',
+},
+
 });

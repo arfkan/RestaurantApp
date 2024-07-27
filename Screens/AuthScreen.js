@@ -1,27 +1,35 @@
 import { StyleSheet, Text, View, TextInput, Button, Dimensions, TouchableOpacity, ImageBackground } from 'react-native';
 import React, { useState } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
+import { firebase } from '../firebase';
 
 const { width, height } = Dimensions.get('window');
 
 export default function AuthScreen({ navigation }) {
-    const [isLogin, setIsLogin] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = () => {
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                // Login successful
+                navigation.navigate('Main');
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
 
     return (
         <ImageBackground source={require('../assets/images/loginimage.jpg')} style={styles.backgroundImage}>
             <View style={styles.container}>
                 <View style={styles.rectangle}>
-                <FontAwesome name="user-circle-o" size={70} color="black" />
-                    <Text style={styles.title}>{isLogin ? 'Giriş Yap' : 'Kayıt ol'}</Text>
-                    <TextInput style={styles.input} placeholder='Kullanıcı Adı' />
-                    <TextInput style={styles.input} placeholder='Şifre' secureTextEntry />
+                    <FontAwesome name="user-circle-o" size={70} color="black" />
+                    <Text style={styles.title}>Giriş Yap</Text>
+                    <TextInput style={styles.input} placeholder='E-posta' value={email} onChangeText={setEmail} />
+                    <TextInput style={styles.input} placeholder='Şifre' secureTextEntry value={password} onChangeText={setPassword} />
                     <View style={styles.buttonContainer}>
-                        <Button
-                            title={isLogin ? 'Giriş yap' : 'Kayıt ol'}
-                            onPress={() => {
-                                navigation.navigate('Main') // burda main dediğimiz yer SearchScreen.js tıklandığında oraya bağlanıyoruz.
-                            }}
-                        />
+                        <Button title="Giriş yap" onPress={handleLogin} />
                     </View>
                     <View style={styles.signupContainer}>
                         <Text>Henüz üye olmadınız mı? </Text>
