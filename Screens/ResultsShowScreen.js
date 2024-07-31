@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import yelp from '../api/yelp';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { useFavorites } from '../context/FavoritesContext';
+import axios from 'axios';
+
+const BASE_URL = 'https://your-api-base-url';
 
 export default function ResultsShowScreen({ route }) {
   const [sonuc, setSonuc] = useState(null);
@@ -10,12 +12,27 @@ export default function ResultsShowScreen({ route }) {
   const id = route.params.id;
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
+
+
   const getSonuc = async (id) => {
     try {
-      const response = await yelp.get(`/${id}`);
+      console.log(`API çağrısı yapılıyor: ${`http://10.0.2.2:5000/api/users`}/${id}`);
+      const response = await axios.get(`${`http://10.0.2.2:5000/api/users`}/${id}`);
       setSonuc(response.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      if (error.response) {
+        // Sunucu 2xx dışında bir durum koduyla yanıt verdi
+        console.error('Error response:', error.response.data);
+        console.error('Error status:', error.response.status);
+        console.error('Error headers:', error.response.headers);
+      } else if (error.request) {
+        // İstek yapıldı ancak yanıt alınamadı
+        console.error('Error request:', error.request);
+      } else {
+        // İsteği hazırlarken bir şeyler yanlış gitti
+        console.error('Error message:', error.message);
+      }
+      console.error('Error config:', error.config);
     }
   };
 
@@ -39,35 +56,17 @@ export default function ResultsShowScreen({ route }) {
   };
 
   if (!sonuc) {
-    return null;
+    return <Text>Yükleniyor...</Text>;
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.title}>
-        <Text style={styles.titleText}>{sonuc.name}</Text>
-      </View>
-      <View style={styles.telno}>
-        <Text>{sonuc.phone}</Text>
-      </View>
-      
-      <View style={styles.iconContainer}>
-        <View style={styles.icon}>
-          {sonuc.is_closed ? (
-            <AntDesign name="closecircleo" size={24} color="black" />
-          ) : (
-            <MaterialIcons name="delivery-dining" size={24} color="black" />
-          )}
-        </View>
-        <TouchableOpacity style={styles.icon2} onPress={toggleFavorite}>
-          <MaterialIcons
-            name={isFavorite ? "favorite" : "favorite-border"}
-            size={24}
-            color={isFavorite ? "red" : "black"}
-          />
-        </TouchableOpacity>
-      </View>
-
+    <View>
+      <Text>{sonuc.name}</Text>
+      <Text>{sonuc.phone}</Text>
+      <Text>{sonuc.is_closed ? 'Kapalı' : 'Açık'}</Text>
+      <TouchableOpacity onPress={toggleFavorite}>
+        <AntDesign name={isFavorite ? "heart" : "hearto"} size={24} color="red" />
+      </TouchableOpacity>
       <FlatList
         data={sonuc.photos}
         keyExtractor={(photo) => photo}

@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import SearchScreen from './Screens/SearchScreen';
+import SearchScreen from './Screens/SearchScreen'; // Burada SearchScreen import ediliyor
 import ResultsShowScreen from './Screens/ResultsShowScreen';
 import FavoriRestaurantlarim from './Screens/FavoriRestaurantlarim';
 import Siparislerim from './Screens/Siparislerim';

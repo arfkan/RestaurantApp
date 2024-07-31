@@ -1,39 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Text, Button} from 'react-native';
+import { View, StyleSheet, Text, Button, TouchableOpacity } from 'react-native';
 import SearchBar from '../components/SearchBar';
-import useResults from '../Hooks/useResults';
+import useResults from '../Hooks/useResults'; // Hook'u kullan
 import ResultsList from '../components/ResultsList';
 import { useFavorites } from '../context/FavoritesContext';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SearchScreen() {
-  const [searchApi, results, errorMessage] = useResults();
+  const [fetchData, results, errorMessage] = useResults();
   const [term, setTerm] = useState('');
-  const {addFavorite} = useFavorites();
-  
+  const { addFavorite } = useFavorites();
+  const navigation = useNavigation();
+
   const renderRestaurantItem = (restaurant) => (
-    <View>
-      <Text>{restaurant.name}</Text>
-      <Button 
-        title="Favorilere Ekle" 
+    <View key={restaurant._id}>
+      <TouchableOpacity onPress={() => navigation.navigate('ResultShowScreen', { id: restaurant._id })}>
+        <Text>{restaurant.name}</Text>
+      </TouchableOpacity>
+      <Button
+        title="Favorilere Ekle"
         onPress={() => {
           addFavorite(restaurant);
           console.log('Favorilere eklendi:', restaurant.name);
-        }} 
+        }}
       />
     </View>
   );
-
-
-  useEffect(() => {
-    // Ekran yüklendiğinde otomatik olarak arama yap
-    searchApi('');
-  }, []);
+  
+  
 
   const filterResultsByPrices = (price) => {
-    return results.filter((result) => {
-      return result.price === price;
-    });
+    return results.filter((result) => result.price === price);
   };
+
+  useEffect(() => {
+    fetchData();
+    console.log('Results:', results); // Veriyi kontrol edin
+    console.log('Error Message:', errorMessage); // Hata mesajını kontrol edin
+  }, []); // terminalde döngüye giriyordu veriler [] şeklinde boş dönmesi ile bu sorun çözüldü.
 
   return (
     <View style={{ flex: 1 }}>
@@ -41,14 +45,14 @@ export default function SearchScreen() {
         <SearchBar
           term={term}
           onTermChange={setTerm}
-          onTermSubmit={() => searchApi(term)}
+          onTermSubmit={() => fetchData(term)}
         />
       </View>
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-      {results.length === 0 ? ( // burda lahmacunnnn diye bir arama yaptık diyelim böyle olduğunda veri tabanında lahmacunn diye bir şey yok bundan dolayı veri gelmiyor boş döndürüyor.
-        <Text></Text> 
+      {results.length === 0 ? (
+        <Text>Veri bulunamadı</Text>
       ) : (
-        <ScrollView>
+        <>
           <ResultsList
             title="Ucuz Restaurantlar"
             results={filterResultsByPrices('₺')}
@@ -64,7 +68,7 @@ export default function SearchScreen() {
             results={filterResultsByPrices('₺₺₺')}
             renderItem={renderRestaurantItem}
           />
-        </ScrollView>
+        </>
       )}
     </View>
   );
