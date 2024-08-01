@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import SearchScreen from './Screens/SearchScreen'; // Burada SearchScreen import ediliyor
+import SearchScreen from './Screens/SearchScreen';
 import ResultsShowScreen from './Screens/ResultsShowScreen';
 import FavoriRestaurantlarim from './Screens/FavoriRestaurantlarim';
 import Siparislerim from './Screens/Siparislerim';
@@ -15,6 +15,7 @@ import { FavoritesProvider } from './context/FavoritesContext';
 import WelcomeScreen from './Screens/WelcomeScreen';
 import AuthScreen from './Screens/AuthScreen';
 import SignupScreen from './Screens/SignupScreen';
+import MapScreen from './Screens/MapScreen';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -58,6 +59,7 @@ function DrawerNavigator() {
       <Drawer.Screen name="Favori Restaurantlarım" component={FavoriRestaurantlarim} />
       <Drawer.Screen name="Siparişlerim" component={Siparislerim} />
       <Drawer.Screen name="Adreslerim" component={Adreslerim} />
+      <Drawer.Screen name="Map" component={MapScreen} />
       <Drawer.Screen name="Search" component={SearchWithTabNavigator} />
     </Drawer.Navigator>
   );
@@ -72,7 +74,6 @@ export default function App() {
           <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />
-          <Stack.Screen name="ResultsShow" component={ResultsShowScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>

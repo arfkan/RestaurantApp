@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Button, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, Button, TouchableOpacity, FlatList } from 'react-native';
 import SearchBar from '../components/SearchBar';
-import useResults from '../Hooks/useResults'; // Hook'u kullan
-import ResultsList from '../components/ResultsList';
+import useResults from '../Hooks/useResults';
 import { useFavorites } from '../context/FavoritesContext';
 import { useNavigation } from '@react-navigation/native';
 
@@ -12,67 +11,45 @@ export default function SearchScreen() {
   const { addFavorite } = useFavorites();
   const navigation = useNavigation();
 
-  const renderRestaurantItem = (restaurant) => (
-    <View key={restaurant._id}>
-      <TouchableOpacity onPress={() => navigation.navigate('ResultShowScreen', { id: restaurant._id })}>
-        <Text>{restaurant.name}</Text>
-      </TouchableOpacity>
+  useEffect(() => {
+    console.log('Fetching data...');
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    console.log('Results:', results); // Veriler frontend'e geliyor mu?
+  }, [results]);
+
+  const renderRestaurantItem = ({ item }) => (
+    <TouchableOpacity onPress={() => navigation.navigate('ResultShowScreen', { id: item._id })}>
+      <Text>{item.name}</Text>
       <Button
         title="Favorilere Ekle"
         onPress={() => {
-          addFavorite(restaurant);
-          console.log('Favorilere eklendi:', restaurant.name);
+          addFavorite(item);
+          console.log('Favorilere eklendi:', item.name);
         }}
       />
-    </View>
+    </TouchableOpacity>
   );
-  
-  
-
-  const filterResultsByPrices = (price) => {
-    return results.filter((result) => result.price === price);
-  };
-
-  useEffect(() => {
-    fetchData();
-    console.log('Results:', results); // Veriyi kontrol edin
-    console.log('Error Message:', errorMessage); // Hata mesajını kontrol edin
-  }, []); // terminalde döngüye giriyordu veriler [] şeklinde boş dönmesi ile bu sorun çözüldü.
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={styles.blueBackground}>
-        <SearchBar
-          term={term}
-          onTermChange={setTerm}
-          onTermSubmit={() => fetchData(term)}
-        />
-      </View>
-      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+    <View style={styles.container}>
+      <SearchBar term={term} onTermChange={setTerm} onTermSubmit={() => fetchData(term)} />
+      {errorMessage ? <Text>{errorMessage}</Text> : null}
       {results.length === 0 ? (
         <Text>Veri bulunamadı</Text>
       ) : (
-        <>
-          <ResultsList
-            title="Ucuz Restaurantlar"
-            results={filterResultsByPrices('₺')}
-            renderItem={renderRestaurantItem}
-          />
-          <ResultsList
-            title="Uygun Restaurantlar"
-            results={filterResultsByPrices('₺₺')}
-            renderItem={renderRestaurantItem}
-          />
-          <ResultsList
-            title="Pahalı Restaurantlar"
-            results={filterResultsByPrices('₺₺₺')}
-            renderItem={renderRestaurantItem}
-          />
-        </>
+        <FlatList
+          data={results[0]?.businesses || []} // İç içe geçmiş 'businesses' dizisini çekiyoruz.
+          keyExtractor={(result, index) => (result?._id ? result._id.toString() : index.toString())} // _id yoksa index kullanıyoruz.
+          renderItem={renderRestaurantItem}
+        />
       )}
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   blueBackground: {
