@@ -4,41 +4,41 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { useFavorites } from '../context/FavoritesContext';
 import axios from 'axios';
 
-const BASE_URL = 'https://your-api-base-url';
+const BASE_URL = 'http://10.0.2.2:5000/api/restaurantapps';
 
 export default function ResultsShowScreen({ route }) {
   const [sonuc, setSonuc] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
-  const id = route.params.id;
+  const {id} = route.params;
   const { favorites, addFavorite, removeFavorite } = useFavorites();
-
 
 
   const getSonuc = async (id) => {
     try {
-      console.log(`API çağrısı yapılıyor: ${`http://10.0.2.2:5000/api/users`}/${id}`);
-      const response = await axios.get(`${`http://10.0.2.2:5000/api/users`}/${id}`);
+      console.log(`API çağrısı yapılıyor: http://10.0.2.2:5000/api/restaurantapps/${id}`);
+      const response = await axios.get(`http://10.0.2.2:5000/api/restaurantapps/${id}`);
+      console.log('API yanıtı:', response.data);
       setSonuc(response.data);
     } catch (error) {
+      console.error('Hata:', error);
+      console.error('Hata yanıtı:', error.response);
       if (error.response) {
-        // Sunucu 2xx dışında bir durum koduyla yanıt verdi
-        console.error('Error response:', error.response.data);
-        console.error('Error status:', error.response.status);
-        console.error('Error headers:', error.response.headers);
-      } else if (error.request) {
-        // İstek yapıldı ancak yanıt alınamadı
-        console.error('Error request:', error.request);
-      } else {
-        // İsteği hazırlarken bir şeyler yanlış gitti
-        console.error('Error message:', error.message);
+        console.error('Durum kodu:', error.response.status);
+        console.error('Hata başlıkları:', error.response.headers);
       }
-      console.error('Error config:', error.config);
+      console.error('Hata detayları:', error.response ? error.response.data : error.message);
     }
   };
+  
 
   useEffect(() => {
-    getSonuc(id);
-  }, []);
+    console.log("Gönderilen ID:", id);
+    if (id) {
+      getSonuc(id);
+    } else {
+      console.error("Geçersiz ID");
+    }
+  }, [id]);
 
   useEffect(() => {
     if (sonuc) {

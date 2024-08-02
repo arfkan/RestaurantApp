@@ -1,23 +1,27 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
-const ResultDetail = ({ result }) => {
-  return (
+const ResultDetail = () => {
+  const route = useRoute();
+  const {result} = route.params;
+
+  return(
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        {result.image_url ? (
-          <Image
-            style={styles.image}
-            source={{ uri: result.image_url }}
-          />
-        ) : (
-          <Text>No image available</Text>
-        )}
-      </View>
-      <Text style={styles.name}>{result.name}</Text>
-      <Text>{result.rating} Yıldızlı Restaurant, {result.review_count} Değerlendirme</Text>
+    <View style={styles.imageContainer}>
+      {result.image_url ? (
+        <Image
+          style={styles.image}
+          source={{ uri: result.image_url }}
+        />
+      ) : (
+        <Text>No image available</Text>
+      )}
     </View>
-  );
+    <Text style={styles.name}>{result.name}</Text>
+    <Text>{result.rating} Yıldızlı Restaurant, {result.review_count} Değerlendirme</Text>
+  </View>
+  )
 };
 
 const styles = StyleSheet.create({

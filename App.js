@@ -16,6 +16,8 @@ import WelcomeScreen from './Screens/WelcomeScreen';
 import AuthScreen from './Screens/AuthScreen';
 import SignupScreen from './Screens/SignupScreen';
 import MapScreen from './Screens/MapScreen';
+import ResultDetail  from './components/ResultDetail';
+
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -61,6 +63,7 @@ function DrawerNavigator() {
       <Drawer.Screen name="Adreslerim" component={Adreslerim} />
       <Drawer.Screen name="Map" component={MapScreen} />
       <Drawer.Screen name="Search" component={SearchWithTabNavigator} />
+
     </Drawer.Navigator>
   );
 }
@@ -74,6 +77,7 @@ export default function App() {
           <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />
+          <Stack.Screen name='ResultsShowScreen' component={ResultsShowScreen}/>
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>
