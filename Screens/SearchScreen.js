@@ -14,7 +14,7 @@ export default function SearchScreen() {
 
   useEffect(() => {
     console.log('Fetching data...');
-    fetchData();
+    fetchData("/restaurants"); // useResult da path diye bir şey tanımladım ve bu yol ile back endde arama yapacağım
   }, []);
 
   useEffect(() => {
@@ -25,8 +25,8 @@ export default function SearchScreen() {
     <TouchableOpacity 
       style={styles.restaurantItem} 
       onPress={() => {
-        console.log("Navigating with ID:", item.id);  // ID'yi loglayalım
-        navigation.navigate('ResultsShowScreen', { id: item.id })
+        console.log("Navigating with ID:", item._id);  
+        navigation.navigate('ResultsShowScreen', { id: item._id })
       }}
 
       >
@@ -57,7 +57,7 @@ export default function SearchScreen() {
         <Text>Veri bulunamadı</Text>
       ) : (
         <FlatList
-          data={results[0]?.businesses || []} 
+          data={results || []} 
           keyExtractor={(result, index) => (result?._id ? result._id.toString() : index.toString())} 
           renderItem={renderRestaurantItem}
         />

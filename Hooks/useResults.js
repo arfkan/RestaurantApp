@@ -3,17 +3,17 @@ import axios from 'axios';
 import { Platform } from 'react-native';
 
 const BASE_URL = Platform.OS === 'android'
-  ? 'http://10.0.2.2:5000/api/users'
-  : 'http://localhost:5000/api/users';
+  ? 'http://10.0.2.2:5000/api'
+  : 'http://localhost:5000/api'; // burda cannot get api aldık burayı sor?
 
 export default () => {
   const [results, setResults] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const fetchData = async () => {
+  const fetchData = async (path) => {
     try {
-      console.log('API çağrısı yapılıyor: ', BASE_URL); 
-      const response = await axios.get(BASE_URL);
+     // console.log('API çağrısı yapılıyor: ', BASE_URL); 
+      const response = await axios.get(BASE_URL+path); // burda BASE_URL + path yaptım ve bunu postmande yazıyorum
       console.log('API Yanıtı:', response); 
       if (response.status === 200 && Array.isArray(response.data) && response.data.length > 0) {
         console.log('API Yanıtı data:', response.data); 

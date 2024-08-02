@@ -4,7 +4,10 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { useFavorites } from '../context/FavoritesContext';
 import axios from 'axios';
 
-const BASE_URL = 'http://10.0.2.2:5000/api/restaurantapps';
+const BASE_URL = Platform.OS === 'android'
+                      ? 'http://10.0.2.2:5000/api/restaurants/'
+                      : 'http://localhost:5000/api/restaurants/';
+
 
 export default function ResultsShowScreen({ route }) {
   const [sonuc, setSonuc] = useState(null);
@@ -15,8 +18,8 @@ export default function ResultsShowScreen({ route }) {
 
   const getSonuc = async (id) => {
     try {
-      console.log(`API çağrısı yapılıyor: http://10.0.2.2:5000/api/restaurantapps/${id}`);
-      const response = await axios.get(`http://10.0.2.2:5000/api/restaurantapps/${id}`);
+      console.log(`API çağrısı yapılıyor: ${BASE_URL}${id}`);
+      const response = await axios.get(`${BASE_URL}${id}`);
       console.log('API yanıtı:', response.data);
       setSonuc(response.data);
     } catch (error) {
@@ -63,6 +66,8 @@ export default function ResultsShowScreen({ route }) {
     <View>
       <Text>{sonuc.name}</Text>
       <Text>{sonuc.phone}</Text>
+      <Text>{sonuc.rating}</Text>
+      <Text>{sonuc.review_count}</Text>
       <Text>{sonuc.is_closed ? 'Kapalı' : 'Açık'}</Text>
       <TouchableOpacity onPress={toggleFavorite}>
         <AntDesign name={isFavorite ? "heart" : "hearto"} size={24} color="red" />
