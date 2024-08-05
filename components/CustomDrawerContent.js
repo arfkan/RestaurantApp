@@ -16,10 +16,15 @@ function CustomDrawerContent(props) {
         label="Adreslerim"
         onPress={() => props.navigation.navigate('Adreslerim')}
       />
+       <DrawerItem
+        label="Admin Paneli"
+        onPress={() => props.navigation.navigate('Admin Paneli')}
+      />
       <DrawerItem
         label="Çıkış"
         onPress={() => alert('Çıkış yapıldı!')}
       />
+
     </DrawerContentScrollView>
   );
 }

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native';
 
-const SearchBar = ({ onTermSubmit, onTermChange }) => {
-    const [term, setTerm] = useState('');
+const SearchBar = ({term, onTermSubmit, onTermChange }) => {
+    // const [term, setTerm] = useState('');
     
     const handleTermChange = (newTerm) => {
-        setTerm(newTerm);
+        // setTerm(newTerm);
         if (onTermChange && typeof onTermChange === 'function') {
             onTermChange(newTerm);
         }
@@ -37,7 +37,7 @@ const SearchBar = ({ onTermSubmit, onTermChange }) => {
 
 const styles = StyleSheet.create({
     background: {
-        backgroundColor: '#F0EEEE',
+        backgroundColor: 'grey',
         height: 50,
         borderRadius: 10,
         marginHorizontal: 20,

@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 
 const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api'
-  : 'http://localhost:5000/api'; // burda cannot get api aldık burayı sor?
+  : 'http://localhost:5000/api';
 
 export default () => {
   const [results, setResults] = useState([]);
@@ -12,11 +12,10 @@ export default () => {
 
   const fetchData = async (path) => {
     try {
-     // console.log('API çağrısı yapılıyor: ', BASE_URL); 
-      const response = await axios.get(BASE_URL+path); // burda BASE_URL + path yaptım ve bunu postmande yazıyorum
-      console.log('API Yanıtı:', response); 
-      if (response.status === 200 && Array.isArray(response.data) && response.data.length > 0) {
-        console.log('API Yanıtı data:', response.data); 
+      const response = await axios.get(BASE_URL + path);
+      console.log('API Yanıtı:', response);
+      if (response.status === 200 && Array.isArray(response.data)) {
+        console.log('API Yanıtı data:', response.data);
         setResults(response.data);
         setErrorMessage('');
       } else {
@@ -36,7 +35,7 @@ export default () => {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData('/restaurants');
   }, []);
 
   return [fetchData, results, errorMessage];

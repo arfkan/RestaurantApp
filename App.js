@@ -16,6 +16,7 @@ import WelcomeScreen from './Screens/WelcomeScreen';
 import AuthScreen from './Screens/AuthScreen';
 import SignupScreen from './Screens/SignupScreen';
 import MapScreen from './Screens/MapScreen';
+import AdminScreen from './Screens/Admin';
 import ResultDetail  from './components/ResultDetail';
 
 
@@ -61,6 +62,7 @@ function DrawerNavigator() {
       <Drawer.Screen name="Favori Restaurantlarım" component={FavoriRestaurantlarim} />
       <Drawer.Screen name="Siparişlerim" component={Siparislerim} />
       <Drawer.Screen name="Adreslerim" component={Adreslerim} />
+      <Drawer.Screen name="Admin Paneli" component={AdminScreen} />
       <Drawer.Screen name="Map" component={MapScreen} />
       <Drawer.Screen name="Search" component={SearchWithTabNavigator} />
 

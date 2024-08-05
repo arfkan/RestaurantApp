@@ -2,99 +2,204 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Button, TouchableOpacity, FlatList, Image} from 'react-native';
 import SearchBar from '../components/SearchBar';
 import useResults from '../Hooks/useResults';
-import { useFavorites } from '../context/FavoritesContext';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+// import FontAwesome from '@expo/vector-icons/FontAwesome';
 
+const API_URL = 'http://192.168.95.101:5000/api/restaurants/';
 
 export default function SearchScreen() {
   const [fetchData, results, errorMessage] = useResults();
   const [term, setTerm] = useState('');
-  const { addFavorite } = useFavorites();
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]); // restaurantlar filtrelendi
+  const [selectedFilter, setSelectedFilter] = useState(null); 
+  const [restaurants, setRestaurants] = useState([]);
+  const [activeFilter, setActiveFilter] = useState(null);
   const navigation = useNavigation();
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData("/restaurants"); // ekran focus edildiğinde veriler geldi
+    }, [])
+  );
+
+  const handleSearch = () => {
+    fetchDataFromAPI(term); 
+  };
+
   useEffect(() => {
-    console.log('Fetching data...');
-    fetchData("/restaurants"); // useResult da path diye bir şey tanımladım ve bu yol ile back endde arama yapacağım
+    fetchDataFromAPI();
   }, []);
 
   useEffect(() => {
-    console.log('Results:', JSON.stringify(results, null, 2)); 
-  }, [results]);
+    filterRestaurants();
+  }, [selectedFilter, term, restaurants]);
+
+  const fetchDataFromAPI = async (searchTerm = '') => {
+    try {
+      const url = searchTerm ? `${API_URL}?search=${searchTerm}` : API_URL;
+      const response = await fetch(url);
+      const data = await response.json();
+      setRestaurants(data);
+      filterRestaurants();
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const filterRestaurants = () => {
+    let filtered = restaurants;
+
+    if (selectedFilter) {
+      filtered = filtered.filter(restaurant => restaurant.price === selectedFilter);
+    }
+
+    if (term) {
+      filtered = filtered.filter(restaurant => 
+        restaurant.name.toLowerCase().includes(term.toLowerCase())
+      );
+    }
+
+    setFilteredRestaurants(filtered);
+  };
+
+  const handleFilter = (filter) => {
+    setSelectedFilter(filter);
+    setActiveFilter(filter); //
+  };
+
+  const defaultImage = 'https://via.placeholder.com/100'; // Default image
 
   const renderRestaurantItem = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.restaurantItem} 
+    <TouchableOpacity
+      style={styles.restaurantItem}
       onPress={() => {
-        console.log("Navigating with ID:", item._id);  
-        navigation.navigate('ResultsShowScreen', { id: item._id })
+        console.log("Navigating with ID:", item._id);
+        navigation.navigate('ResultsShowScreen', { id: item._id });
       }}
-
-      >
-      <Image 
-        source={{ uri: item.image_url }} 
-        style={styles.restaurantImage} 
+    >
+      <Image
+        source={{ uri: item.image_url || defaultImage }}
+        style={styles.restaurantImage}
       />
       <View style={styles.restaurantInfo}>
         <Text style={styles.restaurantName}>{item.name}</Text>
-        <Button
-          title="Favorilere Ekle"
-          onPress={() => {
-            console.log(item.id);
-            addFavorite(item);
-            console.log('Favorilere eklendi:', item.name);
-          }}
-        />
+        <View style={styles.iconButtonContainer}>
+          
+        </View>
       </View>
     </TouchableOpacity>
   );
 
-
   return (
     <View style={styles.container}>
-      <SearchBar term={term} onTermChange={setTerm} onTermSubmit={() => fetchData(term)} />
-      {errorMessage ? <Text>{errorMessage}</Text> : null}
-      {results.length === 0 ? (
-        <Text>Veri bulunamadı</Text>
-      ) : (
-        <FlatList
-          data={results || []} 
-          keyExtractor={(result, index) => (result?._id ? result._id.toString() : index.toString())} 
-          renderItem={renderRestaurantItem}
+      <SearchBar
+        term={term}
+        onTermChange={setTerm}
+        onTermSubmit={handleSearch}
+      />
+      <Text style={styles.title}>Search Restaurants</Text>
+
+      <View style={styles.filterContainer}>
+        <Button 
+          title='Ucuz Restaurantlar (₺)' 
+          onPress={() => handleFilter('₺')} 
         />
-      )}
+        {activeFilter === '₺' && (
+          <FlatList
+            data={filteredRestaurants}
+            renderItem={renderRestaurantItem}
+            keyExtractor={(item) => item._id}
+            vertical = {true}
+          />
+        )}
+        
+        <Button 
+          title='Uygun Restaurantlar (₺₺)' 
+          onPress={() => handleFilter('₺₺')} 
+        />
+        {activeFilter === '₺₺' && (
+          <FlatList
+            data={filteredRestaurants}
+            renderItem={renderRestaurantItem}
+            keyExtractor={(item) => item._id}
+            vertical = {true}
+          />
+        )}
+        
+        <Button 
+          title='Pahalı Restaurantlar (₺₺₺)' 
+          onPress={() => handleFilter('₺₺₺')} 
+        />
+        {activeFilter === '₺₺₺' && (
+          <FlatList
+            data={filteredRestaurants}
+            renderItem={renderRestaurantItem}
+            keyExtractor={(item) => item._id}
+            vertical = {true}
+          />
+        )}
+        
+        <Button 
+          title='Tümünü Göster' 
+          onPress={() => {
+            setSelectedFilter(null);
+            setActiveFilter(null); 
+          }} 
+        />
+        {activeFilter === null && (
+          <FlatList
+            data={filteredRestaurants}
+            renderItem={renderRestaurantItem}
+            keyExtractor={(item) => item._id}
+            vertical = {true}
+          />
+        )}
+      </View>
+     
+      {errorMessage ? <Text>{errorMessage}</Text> : null}
+      {results.length === 0 && activeFilter === null ? (
+        <Text>Veri bulunamadı</Text>
+      ) : null}
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  filterContainer: {
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    marginBottom: 16,
+    gap: 5,
   },
   restaurantItem: {
     flexDirection: 'row',
-    padding: 10,
+    padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#ccc',
   },
   restaurantImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
+    width: 100,
+    height: 100,
+    borderRadius: 8,
   },
   restaurantInfo: {
-    flex: 1,
+    marginLeft: 16,
+    justifyContent: 'center',
   },
   restaurantName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
+    fontSize: 18,
   },
-  errorText: {
-    color: 'red',
-    marginTop: 10,
-    textAlign: 'center',
+  iconButtonContainer: {
+    flexDirection: 'row',
+    marginTop: 8,
   },
 });
