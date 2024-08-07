@@ -80,6 +80,7 @@ export default function App() {
           <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />
           <Stack.Screen name='ResultsShowScreen' component={ResultsShowScreen}/>
+          <Stack.Screen name='FavoriRestaurantlarim' component={FavoriRestaurantlarim}/>
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>

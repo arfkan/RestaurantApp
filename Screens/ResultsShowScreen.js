@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, Platform } from 'react-native';
+import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, Platform, ScrollView } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useFavorites } from '../context/FavoritesContext';
 import axios from 'axios';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const BASE_URL = Platform.OS === 'android'
-                      ? 'http://10.0.2.2:5000/api/restaurants/'
-                      : 'http://localhost:5000/api/restaurants/';
+  ? 'http://10.0.2.2:5000/api/'
+  : 'http://localhost:5000/api/';
 
 export default function ResultsShowScreen({ route }) {
   const [sonuc, setSonuc] = useState(null);
@@ -14,22 +15,25 @@ export default function ResultsShowScreen({ route }) {
   const { id } = route.params;
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
+  // API'den veri çekme işlevi
   const getSonuc = async (id) => {
     try {
-      console.log(`API çağrısı yapılıyor: ${BASE_URL}${id}`);
-      const response = await axios.get(`${BASE_URL}${id}`);
-      console.log('API yanıtı:', response.data);
+      console.log(`API çağrısı yapılıyor: ${BASE_URL}restaurants/${id}`);
+      const response = await axios.get(`${BASE_URL}restaurants/${id}`);
+      console.log('API yanıtı:', response.data); // API yanıtını kontrol edin
       setSonuc(response.data);
     } catch (error) {
       console.error('Hata:', error);
-      console.error('Hata yanıtı:', error.response);
       if (error.response) {
         console.error('Durum kodu:', error.response.status);
         console.error('Hata başlıkları:', error.response.headers);
+        console.error('Hata detayları:', error.response.data);
+      } else {
+        console.error('Hata mesajı:', error.message);
       }
-      console.error('Hata detayları:', error.response ? error.response.data : error.message);
     }
   };
+  
 
   useEffect(() => {
     console.log("Gönderilen ID:", id);
@@ -46,84 +50,113 @@ export default function ResultsShowScreen({ route }) {
     }
   }, [favorites, sonuc]);
 
-  const toggleFavorite = () => {
-    if (isFavorite) {
-      removeFavorite(sonuc.id);
-    } else {
-      addFavorite(sonuc);
+  const toggleFavorite = async () => {
+    try {
+      if (isFavorite) {
+        await axios.delete(`${BASE_URL}favorites/${sonuc.id}`);
+        removeFavorite(sonuc.id);
+      } else {
+        const response = await axios.post(`${BASE_URL}favorites`, {
+          userId: '45TPJloYrCSCnSg1XktWjdEpLAO2',
+          restaurant: {
+            id: sonuc.id,
+            name: sonuc.name,
+            image_url: sonuc.image_url
+          }
+        });
+        addFavorite(response.data);
+      }
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error('Favori işlemi sırasında hata:', error.response ? error.response.data : error.message);
     }
-    setIsFavorite(!isFavorite);
   };
 
   if (!sonuc) {
-    return <Text style={styles.loadingText}>Yükleniyor...</Text>;
+    return <Text>Loading...</Text>;
   }
 
+  const photos = [sonuc.image_url, ...(sonuc.photos || [])];
+
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.titleText}>{sonuc.name}</Text>
-        <TouchableOpacity onPress={toggleFavorite} style={styles.favoriteButton}>
+    <ScrollView style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>{sonuc.name}</Text>
+        <TouchableOpacity onPress={toggleFavorite}>
           <AntDesign name={isFavorite ? "heart" : "hearto"} size={24} color="red" />
         </TouchableOpacity>
       </View>
       <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>Telefon: {sonuc.phone}</Text>
-        <Text style={styles.infoText}>Puan: {sonuc.rating}</Text>
-        <Text style={styles.infoText}>Yorum Sayısı: {sonuc.review_count}</Text>
-        <Text style={styles.infoText}>{sonuc.is_closed ? 'Kapalı' : 'Açık'}</Text>
+        <View style={styles.infoRow}>
+          <Icon name="phone" size={20} color="red" />
+          <Text style={styles.infoText}> Telefon: {sonuc.phone}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Icon name="star" size={20} color="red" />
+          <Text style={styles.infoText}>Puan: {sonuc.rating}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Icon name="comment" size={20} color="red" />
+          <Text style={styles.infoText}>Yorum Sayısı: {sonuc.review_count}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Icon name="location-on" size={20} color="red" />
+          <Text style={styles.infoText}>Adres: {sonuc.location.display_address.join(', ')}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Icon name="menu" size={20} color="red"/>
+          <Text style={styles.infoText}>Menu: {sonuc.attributes.menu_url}</Text>
+        </View>
       </View>
       <FlatList
-        data={sonuc.photos}
+        data={photos}
         keyExtractor={(photo) => photo}
         renderItem={({ item }) => (
           <Image style={styles.image} source={{ uri: item }} />
         )}
         ListEmptyComponent={<Text style={styles.emptyText}>Görsel bulunamadı.</Text>}
       />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
   },
-  header: {
+  headerContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
-  titleText: {
+  headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    flex: 1,
-  },
-  favoriteButton: {
-    padding: 10,
   },
   infoContainer: {
-    marginBottom: 20,
+    padding: 16,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   infoText: {
     fontSize: 16,
-    marginBottom: 10,
+    marginLeft: 8,
   },
   image: {
     width: '100%',
     height: 200,
-    marginBottom: 10,
-    borderRadius: 10,
-  },
-  loadingText: {
-    textAlign: 'center',
-    marginTop: 20,
+    marginBottom: 8,
   },
   emptyText: {
     textAlign: 'center',
-    color: '#888',
+    margin: 16,
+    fontSize: 16,
   },
 });

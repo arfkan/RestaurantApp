@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     background: {
         backgroundColor: 'grey',
         height: 50,
-        borderRadius: 10,
+        borderRadius: 30,
         marginHorizontal: 20,
         flexDirection: 'row',
         marginTop: 10,
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'green', 
         paddingVertical: 8, 
         paddingHorizontal: 16, 
-        borderRadius: 8, 
+        borderRadius: 30, 
         marginLeft: 10,
     },
 });

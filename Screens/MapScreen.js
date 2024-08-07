@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+/*import React, { useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { StyleSheet, View, Button } from 'react-native';
+import { StyleSheet, View, Button, Platform } from 'react-native';
 import axios from 'axios'; 
+import { useAddresses } from '../Hooks/useAddresses';
 
-export default function MapScreen() {
-    const [selectedLocation, setSelectedLocation] = useState(null);
+const BASE_URL = Platform.OS === 'android'
+  ? 'http://10.0.2.2:5000/api/'
+  : 'http://localhost:5000/api/';
+
+export default function MapScreen({ navigation }) {
+    const [selectedLocation, setSelectedLocation] = useState({
+        latitude: 41.0082,
+        longitude: 28.9784,
+    });
+    const { addAddress } = useAddresses();
 
     const handleMapPress = (event) => {
         const { latitude, longitude } = event.nativeEvent.coordinate;
@@ -15,45 +24,47 @@ export default function MapScreen() {
         if (selectedLocation) {
             console.log('Gönderilen veri:', selectedLocation);
             try {
-                const response = await axios.post('http://localhost:5000/saveLocation', selectedLocation);
+                // Veritabanına kaydet
+                const response = await axios.post(`${BASE_URL}saveLocation`, selectedLocation);
                 console.log('Sunucu yanıtı:', response.data);
+
+                // Adreslerim.js'e kaydet
+                const address = `Lat: ${selectedLocation.latitude}, Lng: ${selectedLocation.longitude}`;
+                await addAddress(address, selectedLocation.latitude, selectedLocation.longitude);
+
+                // Adreslerim sayfasına yönlendir
+                navigation.navigate('Adreslerim');
             } catch (error) {
                 console.error('Hata detayları:', error.response ? error.response.data : error.message);
             }
         }
     };
 
-
-
     return (
         <View style={styles.container}>
             <MapView
                 style={styles.map}
                 initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
+                    latitude: 41.0082,
+                    longitude: 28.9784,
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                 }}
                 onPress={handleMapPress}
             >
-                {selectedLocation && (
-                    <Marker coordinate={selectedLocation} />
-                )}
+                <Marker coordinate={selectedLocation} />
             </MapView>
-            {selectedLocation && (
-                <Button title="Konumu Kaydet" onPress={handleSaveLocation} />
-            )}
+            <Button title="Konumu Kaydet" onPress={handleSaveLocation} />
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
     map: {
-        ...StyleSheet.absoluteFillObject,
+        width: '100%',
+        height: '90%',
     },
 });
-
+*/

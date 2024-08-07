@@ -1,24 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Button, TouchableOpacity, FlatList, Image} from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList, Image, Animated } from 'react-native';
 import SearchBar from '../components/SearchBar';
 import useResults from '../Hooks/useResults';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-// import FontAwesome from '@expo/vector-icons/FontAwesome';
+import SpeedDial from '../components/SpeedDial';
 
-const API_URL = 'http://192.168.95.101:5000/api/restaurants/';
+const API_URL = 'http://192.168.95.87:5000/api/restaurants/'; // burda uygulama ilk açıldığında  veriler gelmedi pc ıpv4 adresini almak ve yazmak lazım.
 
 export default function SearchScreen() {
   const [fetchData, results, errorMessage] = useResults();
   const [term, setTerm] = useState('');
-  const [filteredRestaurants, setFilteredRestaurants] = useState([]); // restaurantlar filtrelendi
-  const [selectedFilter, setSelectedFilter] = useState(null); 
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState(null);
   const [restaurants, setRestaurants] = useState([]);
-  const [activeFilter, setActiveFilter] = useState(null);
+  const [isSpeedDialOpen, setIsSpeedDialOpen] = useState(false);
   const navigation = useNavigation();
+  const listAnimation = useRef(new Animated.Value(0)).current;
+  const titleAnimation = useRef(new Animated.Value(0)).current;
+
+  const speedDialActions = [
+    { icon: 'attach-money', name: "Ucuz Restaurantlar", onPress: () => handleFilter('₺') },
+    { icon: 'attach-money', name: "Uygun Restaurantlar", onPress: () => handleFilter('₺₺') },
+    { icon: 'attach-money', name: "Pahalı Restaurantlar", onPress: () => handleFilter('₺₺₺') },
+    { icon: 'restaurant-menu', name: "Tüm Restaurantlar", onPress: () => handleFilter(null) },
+  ];
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchData("/restaurants"); // ekran focus edildiğinde veriler geldi
+      fetchData("/restaurants");
     }, [])
   );
 
@@ -33,6 +42,13 @@ export default function SearchScreen() {
   useEffect(() => {
     filterRestaurants();
   }, [selectedFilter, term, restaurants]);
+
+  useEffect(() => {
+    Animated.spring(listAnimation, {
+      toValue: isSpeedDialOpen ? 200 : 0,
+      useNativeDriver: true,
+    }).start();
+  }, [isSpeedDialOpen]);
 
   const fetchDataFromAPI = async (searchTerm = '') => {
     try {
@@ -64,16 +80,38 @@ export default function SearchScreen() {
 
   const handleFilter = (filter) => {
     setSelectedFilter(filter);
-    setActiveFilter(filter); //
+    setIsSpeedDialOpen(false);
   };
 
-  const defaultImage = 'https://via.placeholder.com/100'; // Default image
+  const handleOpen = () => {
+    setIsSpeedDialOpen(true);
+    Animated.timing(titleAnimation, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+  
+  const handleClose = () => {
+    setIsSpeedDialOpen(false);
+    Animated.timing(titleAnimation, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+  
+  const titleTranslateX = titleAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [50, 0],
+  });
+
+  const defaultImage = 'https://via.placeholder.com/100';
 
   const renderRestaurantItem = ({ item }) => (
     <TouchableOpacity
       style={styles.restaurantItem}
       onPress={() => {
-        console.log("Navigating with ID:", item._id);
         navigation.navigate('ResultsShowScreen', { id: item._id });
       }}
     >
@@ -83,9 +121,7 @@ export default function SearchScreen() {
       />
       <View style={styles.restaurantInfo}>
         <Text style={styles.restaurantName}>{item.name}</Text>
-        <View style={styles.iconButtonContainer}>
-          
-        </View>
+        <Text style={styles.restaurantPrice}>{item.price}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -97,68 +133,31 @@ export default function SearchScreen() {
         onTermChange={setTerm}
         onTermSubmit={handleSearch}
       />
-      <Text style={styles.title}>Search Restaurants</Text>
+        <Animated.View style={[styles.titleContainer, { opacity: titleAnimation, transform: [{ translateX: titleTranslateX }] }]}>
+          <Text style={styles.title}>Aradığın Restaurantlar burada!</Text>
+        </Animated.View>
 
-      <View style={styles.filterContainer}>
-        <Button 
-          title='Ucuz Restaurantlar (₺)' 
-          onPress={() => handleFilter('₺')} 
+
+      <View style={styles.speedDialContainer}>
+        <SpeedDial 
+          actions={speedDialActions} 
+          onOpen={handleOpen}
+          onClose={handleClose}
         />
-        {activeFilter === '₺' && (
-          <FlatList
-            data={filteredRestaurants}
-            renderItem={renderRestaurantItem}
-            keyExtractor={(item) => item._id}
-            vertical = {true}
-          />
-        )}
-        
-        <Button 
-          title='Uygun Restaurantlar (₺₺)' 
-          onPress={() => handleFilter('₺₺')} 
-        />
-        {activeFilter === '₺₺' && (
-          <FlatList
-            data={filteredRestaurants}
-            renderItem={renderRestaurantItem}
-            keyExtractor={(item) => item._id}
-            vertical = {true}
-          />
-        )}
-        
-        <Button 
-          title='Pahalı Restaurantlar (₺₺₺)' 
-          onPress={() => handleFilter('₺₺₺')} 
-        />
-        {activeFilter === '₺₺₺' && (
-          <FlatList
-            data={filteredRestaurants}
-            renderItem={renderRestaurantItem}
-            keyExtractor={(item) => item._id}
-            vertical = {true}
-          />
-        )}
-        
-        <Button 
-          title='Tümünü Göster' 
-          onPress={() => {
-            setSelectedFilter(null);
-            setActiveFilter(null); 
-          }} 
-        />
-        {activeFilter === null && (
-          <FlatList
-            data={filteredRestaurants}
-            renderItem={renderRestaurantItem}
-            keyExtractor={(item) => item._id}
-            vertical = {true}
-          />
-        )}
       </View>
-     
-      {errorMessage ? <Text>{errorMessage}</Text> : null}
-      {results.length === 0 && activeFilter === null ? (
-        <Text>Veri bulunamadı</Text>
+      
+      <Animated.View style={[styles.listContainer, { transform: [{ translateY: listAnimation }] }]}>
+        <FlatList
+          data={filteredRestaurants.length > 0 ? filteredRestaurants : restaurants}
+          renderItem={renderRestaurantItem}
+          keyExtractor={(item) => item._id}
+          vertical={true}
+        />
+      </Animated.View>
+
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+      {restaurants.length === 0 && !errorMessage ? (
+        <Text style={styles.noDataText}>Veri bulunamadı</Text>
       ) : null}
     </View>
   );
@@ -167,39 +166,54 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    paddingTop: 10,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  filterContainer: {
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-    marginBottom: 16,
-    gap: 5,
+  listContainer: {
+    flex: 1,
   },
   restaurantItem: {
     flexDirection: 'row',
-    padding: 16,
+    padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: 'black',
   },
   restaurantImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
+    width: 75,
+    height: 75,
+    borderRadius: 25,
   },
   restaurantInfo: {
-    marginLeft: 16,
+    marginLeft: 10,
     justifyContent: 'center',
   },
   restaurantName: {
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  iconButtonContainer: {
+  restaurantPrice: {
+    fontSize: 14,
+    color: 'gray',
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  noDataText: {
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  speedDialContainer: {
     flexDirection: 'row',
-    marginTop: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  titleContainer: {
+    marginLeft: 10,
+  },
+  title: {
+    fontSize: 18,
+    color: 'black',
+    fontWeight: 25,
   },
 });
