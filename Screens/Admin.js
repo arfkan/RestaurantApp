@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Button, TextInput, Alert, FlatList, Image, Touc
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-const API_URL = 'http://192.168.95.87:5000/api/restaurants/';
+const API_URL = 'http://192.168.95.106:5000/api/restaurants/'; // ipconfig cmd değişiyor ıp adresleri 
 
 export default function AdminScreen() {
   const [name, setName] = useState('');

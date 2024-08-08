@@ -40,6 +40,16 @@ const SpeedDial = ({ actions, onOpen, onClose }) => {
       },
     ],
   };
+  const reverseRotation = {
+    transform: [
+      {
+        rotate: animation.interpolate({
+          inputRange: [0, 1],
+          outputRange: ['-45deg', '0deg'], 
+        }),
+      },
+    ],
+  };
 
   return (
     <View style={styles.container}>
@@ -48,7 +58,7 @@ const SpeedDial = ({ actions, onOpen, onClose }) => {
         onPress={toggleMenu}
         activeOpacity={0.8}
       >
-        <Animated.View style={rotation}>
+        <Animated.View style={open ? rotation : reverseRotation}>
           <Icon name="filter-list" size={24} color="#fff"  />
         </Animated.View>
       </TouchableOpacity>
@@ -72,14 +82,17 @@ const SpeedDial = ({ actions, onOpen, onClose }) => {
                 { transform: [{ translateX }], opacity }
               ]}
             >
+              
               <SpeedDialAction
                 name={action.name}
                 onPress={() => {
                   action.onPress();
-                  setOpen(false);
+                  setOpen(false); // set(!open)
+                  toggleMenu();
                 }}
               />
             </Animated.View>
+            // yukarıda SpeedDialAc
           );
         })}
       </View>

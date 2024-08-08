@@ -5,7 +5,7 @@ import useResults from '../Hooks/useResults';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import SpeedDial from '../components/SpeedDial';
 
-const API_URL = 'http://192.168.95.87:5000/api/restaurants/'; // burda uygulama ilk açıldığında  veriler gelmedi pc ıpv4 adresini almak ve yazmak lazım.
+const API_URL = 'http://192.168.95.106:5000/api/restaurants/'; // burda uygulama ilk açıldığında  veriler gelmedi pc ıpv4 adresini almak ve yazmak lazım.
 
 export default function SearchScreen() {
   const [fetchData, results, errorMessage] = useResults();

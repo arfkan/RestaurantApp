@@ -2,13 +2,16 @@ import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Platform } from 'react-native';
 import { useFavorites } from '../context/FavoritesContext';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
 
 const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
   : 'http://localhost:5000/api/';
 
+
 export default function FavoriRestaurantlarim() {
   const { favorites, setFavorites, removeFavorite } = useFavorites();
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -35,47 +38,54 @@ export default function FavoriRestaurantlarim() {
       removeFavorite(id);
     } catch (error) {
       if (error.response) {
-        // İstemci tarafında sunucudan dönen hata mesajı
         console.error('Sunucu Hatası:', error.response.data);
       } else if (error.request) {
-        // İstek gönderildi ancak yanıt alınamadı
         console.error('İstek Hatası:', error.request);
       } else {
-        // Diğer hatalar
         console.error('Hata:', error.message);
       }
     }
   };
-  
+
   const renderItem = ({ item }) => {
     if (!item || !item.id) {
-      console.error('Geçersiz item:', item);
+      console.error('Geçersiz item');
       return null;
     }
-  
+
     return (
       <View style={styles.item}>
-        <Image 
-          source={{ uri: item.image_url }} 
-          style={styles.image} 
-          onError={(e) => console.log('Image loading error:', e.nativeEvent.error)}
-        />
-        <View style={styles.itemContent}>
-          <Text style={styles.itemName}>{item.name}</Text>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              console.log('Butona tıklandı!');
-              handleRemoveFavorite(item.id);
-            }}
-          >
-            <Text style={styles.buttonText}>Favorilerden Çıkar</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.restaurantItem}
+          onPress={() => {
+            console.log("item id:", item._id);
+            
+            navigation.navigate('ResultsShowScreen', { id: item._id });
+          }}
+        >
+          <Image 
+            source={{ uri: item.image_url }} 
+            style={styles.image} 
+            onError={(e) => console.log('Image loading error:', e.nativeEvent.error)}
+          />
+          <View style={styles.itemContent}>
+            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.itemPrice}>{item.price}</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                console.log('Butona tıklandı!');
+                handleRemoveFavorite(item.id);
+              }}
+            >
+              <Text style={styles.buttonText}>Favorilerden Çıkar</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
       </View>
     );
   };
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Favori Restaurantlarım</Text>
@@ -83,7 +93,7 @@ export default function FavoriRestaurantlarim() {
         <FlatList
           data={favorites}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id ? item.id.toString() : Math.random().toString()} // ekrana gelen toString hatasını burda çözdüm.
+          keyExtractor={(item) => item.id ? item.id.toString() : Math.random().toString()}
         />
       ) : (
         <Text style={styles.emptyText}>Henüz favori restoran eklenmedi.</Text>
@@ -95,52 +105,53 @@ export default function FavoriRestaurantlarim() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    padding: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 18,
-    color: 'gray',
+    marginBottom: 16,
   },
   item: {
     flexDirection: 'row',
-    padding: 10,
-    marginVertical: 5,
-    marginHorizontal: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    marginBottom: 16,
+  },
+  restaurantItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   image: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     borderRadius: 8,
   },
   itemContent: {
     flex: 1,
-    marginLeft: 10,
-    justifyContent: 'center',
+    marginLeft: 16,
   },
   itemName: {
     fontSize: 18,
     fontWeight: 'bold',
   },
+  itemPrice: {
+    fontSize: 16,
+    color: 'gray',
+  },
   button: {
-    marginTop: 10,
-    backgroundColor: '#ff6347',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: 'red',
+    borderRadius: 4,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 14,
+    color: 'white',
+    textAlign: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: 'gray',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });

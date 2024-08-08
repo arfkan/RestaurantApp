@@ -1,4 +1,4 @@
-/*import React, { useState } from 'react';
+import React, { useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, View, Button, Platform } from 'react-native';
 import axios from 'axios'; 
@@ -67,4 +67,3 @@ const styles = StyleSheet.create({
         height: '90%',
     },
 });
-*/
