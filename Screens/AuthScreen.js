@@ -4,6 +4,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { firebase } from '../firebase';
 import axios from "axios";
 
+
 const { width, height } = Dimensions.get('window');
 
 export default function AuthScreen({ navigation }) {

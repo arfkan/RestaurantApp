@@ -18,6 +18,7 @@ import SignupScreen from './Screens/SignupScreen';
 import MapScreen from './Screens/MapScreen';
 import AdminScreen from './Screens/Admin';
 import ResultDetail  from './components/ResultDetail';
+import ProductResult from './Screens/ProductResult';
 
 
 const Stack = createNativeStackNavigator();
@@ -35,6 +36,7 @@ function MainStackNavigator() {
     >
       <Stack.Screen name="Search" component={SearchScreen} />
       <Stack.Screen name="ResultsShow" component={ResultsShowScreen} />
+      <Stack.Screen name='ProductResult' component={ProductResult}/>
     </Stack.Navigator>
   );
 }
@@ -81,6 +83,8 @@ export default function App() {
           <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />
           <Stack.Screen name='ResultsShowScreen' component={ResultsShowScreen}/>
           <Stack.Screen name='FavoriRestaurantlarim' component={FavoriRestaurantlarim}/>
+          <Stack.Screen name='Siparislerim' component={Siparislerim}/>
+          <Stack.Screen name='ProductResult' component={ProductResult}/>
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>

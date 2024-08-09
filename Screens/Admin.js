@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Button, TextInput, Alert, FlatList, Image, Touc
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-const API_URL = 'http://192.168.95.106:5000/api/restaurants/'; // ipconfig cmd değişiyor ıp adresleri 
+const API_URL = 'http://192.168.95.119:5000/api/restaurants/';
 
 export default function AdminScreen() {
   const [name, setName] = useState('');
@@ -52,7 +52,7 @@ export default function AdminScreen() {
           onPress: () => {
             setName('');
             setImageUrl('');
-            fetchData(); // Liste güncellemesi yapılıyor burda
+            fetchData();
           }
         }
       ]);
@@ -122,7 +122,9 @@ export default function AdminScreen() {
         value={imageUrl}
         onChangeText={setImageUrl}
       />
-      <Button title="Add Restaurant" onPress={handleAddRestaurant} />
+      <TouchableOpacity style={styles.addButton} onPress={handleAddRestaurant}>
+        <Text style={styles.addButtonText}>Add Restaurant</Text>
+      </TouchableOpacity>
       <FlatList
         data={restaurants}
         renderItem={renderRestaurantItem}
@@ -142,13 +144,30 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#333',
+    textAlign: 'center',
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
+    height: 50,
+    borderColor: '#ccc',
     borderWidth: 1,
+    borderRadius: 8,
     marginBottom: 16,
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
+    fontSize: 16,
+    backgroundColor: '#f9f9f9',
+  },
+  addButton: {
+    backgroundColor: '#f0ad4e',
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   restaurantItem: {
     flexDirection: 'row',
@@ -156,11 +175,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    marginBottom: 10,
   },
   restaurantImage: {
     width: 50,
     height: 50,
     marginRight: 10,
+    borderRadius: 25,
   },
   restaurantInfo: {
     flex: 1,
@@ -171,9 +194,11 @@ const styles = StyleSheet.create({
   restaurantName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
   },
   iconButtonContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+
 });

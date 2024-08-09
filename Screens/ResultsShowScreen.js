@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, Platform, ScrollView } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
-import { useFavorites } from '../context/FavoritesContext';
+import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, Platform, ScrollView, ActivityIndicator} from 'react-native';
 import axios from 'axios';
+import { AntDesign } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useFavorites } from '../context/FavoritesContext';
+import { useNavigation } from '@react-navigation/native';
 
 const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
@@ -14,34 +15,50 @@ export default function ResultsShowScreen({ route }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const { id } = route.params;
   const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // API'den veri çekme işlevi
-  const getSonuc = async (id) => {
+  const navigation = useNavigation(); // Get navigation object
+
+  // API'den restoran verilerini çekme işlevi
+  const getSonuc = async () => {
+    if (!id) {
+      console.error("Geçersiz ID");
+      return;
+    }
+
     try {
-      console.log(`API çağrısı yapılıyor: ${BASE_URL}restaurants/${id}`);
       const response = await axios.get(`${BASE_URL}restaurants/${id}`);
-      console.log('API yanıtı:', response.data); // API yanıtını kontrol edin
       setSonuc(response.data);
     } catch (error) {
       console.error('Hata:', error);
       if (error.response) {
-        console.error('Durum kodu:', error.response.status);
-        console.error('Hata başlıkları:', error.response.headers);
-        console.error('Hata detayları:', error.response.data);
+        setError('API Hatası');
       } else {
-        console.error('Hata mesajı:', error.message);
+        setError('Ağ Hatası');
       }
     }
   };
-  
+
+  // Ürünleri çekme işlevi
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}products`);
+      setProducts(response.data);
+    } catch (error) {
+      setError('Ürünleri alırken hata oluştu');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    console.log("Gönderilen ID:", id);
-    if (id) {
-      getSonuc(id);
-    } else {
-      console.error("Geçersiz ID");
-    }
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    getSonuc();
   }, [id]);
 
   useEffect(() => {
@@ -68,9 +85,13 @@ export default function ResultsShowScreen({ route }) {
       }
       setIsFavorite(!isFavorite);
     } catch (error) {
-      console.error('Favori işlemi sırasında hata:', error.response ? error.response.data : error.message);
+      console.error('Favori işlemi sırasında hata:', error.message);
+      alert('Favori işlemi sırasında bir hata oluştu.');
     }
   };
+
+  if (loading) return <ActivityIndicator size="large" color="#0000ff" />;
+  if (error) return <Text>{error}</Text>;
 
   if (!sonuc) {
     return <Text>Loading...</Text>;
@@ -89,7 +110,7 @@ export default function ResultsShowScreen({ route }) {
       <View style={styles.infoContainer}>
         <View style={styles.infoRow}>
           <Icon name="phone" size={20} color="red" />
-          <Text style={styles.infoText}> Telefon: {sonuc.phone}</Text>
+          <Text style={styles.infoText}>Telefon: {sonuc.phone}</Text>
         </View>
         <View style={styles.infoRow}>
           <Icon name="star" size={20} color="red" />
@@ -104,59 +125,128 @@ export default function ResultsShowScreen({ route }) {
           <Text style={styles.infoText}>Adres: {sonuc.location.display_address.join(', ')}</Text>
         </View>
         <View style={styles.infoRow}>
-          <Icon name="menu" size={20} color="red"/>
-          <Text style={styles.infoText}>Menu: {sonuc.attributes.menu_url}</Text>
+          <Icon name="menu" size={20} color="red" />
+          <Text style={styles.infoText}>Menü: {sonuc.attributes.menu_url}</Text>
         </View>
       </View>
-      <FlatList
-        data={photos}
-        keyExtractor={(photo) => photo}
-        renderItem={({ item }) => (
-          <Image style={styles.image} source={{ uri: item }} />
-        )}
-        ListEmptyComponent={<Text style={styles.emptyText}>Görsel bulunamadı.</Text>}
-      />
+      <ScrollView horizontal>
+        {photos.map((photo, index) => (
+          <Image key={index} style={styles.image} source={{ uri: photo }} />
+        ))}
+      </ScrollView>
+      <View style={styles.productList}>
+        <Text style={styles.productListHeader}>Ürünler:</Text>
+        <FlatList
+  data={products}
+  keyExtractor={(item) => item._id}
+  numColumns={2} // burda yan yana iki tane görsel yan yana geliyor.
+  renderItem={({ item }) => (
+    <View style={styles.productItem}>
+      <View style={styles.imageContainer}> 
+      <TouchableOpacity
+           onPress={() => {
+             navigation.navigate('ProductResult', { id: item._id });
+           }}
+           >
+           <Image source={{ uri: item.image }} style={styles.productImage} />
+         </TouchableOpacity>
+
+        <Icon
+          name="add"
+          size={30}
+          color="red"
+          style={styles.icon}
+          onPress={() => {
+            navigation.navigate('Siparislerim', { id: item._id });
+          }}
+        />
+      </View>
+      <Text style={styles.productName}>{item.name}</Text>
+      <Text style={styles.productPrice}>${item.price}</Text>
+    </View>
+  )}
+/>
+      </View>
     </ScrollView>
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
+    flex:1,
+    padding: 10,
   },
   headerContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    alignItems: 'center',
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
   },
   infoContainer: {
-    padding: 16,
+    marginVertical: 10,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 5,
   },
   infoText: {
+    marginLeft: 10,
     fontSize: 16,
-    marginLeft: 8,
+    color: '#333', 
+    fontWeight: '600', 
+    lineHeight: 24, 
+    letterSpacing: 0.5, 
+    textTransform: 'capitalize', 
   },
-  image: {
-    width: '100%',
+  
+  /*image: {
+    width: 200,
     height: 200,
-    marginBottom: 8,
+    margin: 5,
+  },*/
+  productList: {
+    marginTop: 20,
   },
-  emptyText: {
-    textAlign: 'center',
-    margin: 16,
+  productListHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  productItem: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: 20,
+    marginHorizontal: 10,
+    flex: 1,
+  },
+  imageContainer: {
+    position: 'relative', 
+    width: 150,
+    height: 150,
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
+  },
+  icon: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+  },
+  productName: {
+    marginTop: 10,
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  productPrice: {
+    marginTop: 5,
+    fontSize: 14,
+    color: '#888',
   },
 });

@@ -4,6 +4,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
+
 const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
   : 'http://localhost:5000/api/';
@@ -39,28 +40,32 @@ export default function FavoriRestaurantlarim() {
     } catch (error) {
       if (error.response) {
         console.error('Sunucu Hatası:', error.response.data);
+        alert(`Sunucu Hatası: ${error.response.data.message || 'Bir hata oluştu'}`);
       } else if (error.request) {
         console.error('İstek Hatası:', error.request);
+        alert('İstek hatası: Sunucuya ulaşılamıyor.');
       } else {
         console.error('Hata:', error.message);
+        alert('Bir hata oluştu: ' + error.message);
       }
     }
   };
-
+  
   const renderItem = ({ item }) => {
-    if (!item || !item.id) {
+    const restaurantId = item._id || item.id;
+  
+    if (!restaurantId) {
       console.error('Geçersiz item');
       return null;
     }
-
+  
     return (
       <View style={styles.item}>
         <TouchableOpacity
           style={styles.restaurantItem}
           onPress={() => {
-            console.log("item id:", item._id);
-            
-            navigation.navigate('ResultsShowScreen', { id: item._id });
+            console.log("Navigating with ID:", restaurantId);
+            navigation.navigate('ResultsShowScreen', { id: restaurantId });
           }}
         >
           <Image 
@@ -75,7 +80,7 @@ export default function FavoriRestaurantlarim() {
               style={styles.button}
               onPress={() => {
                 console.log('Butona tıklandı!');
-                handleRemoveFavorite(item.id);
+                handleRemoveFavorite(restaurantId);
               }}
             >
               <Text style={styles.buttonText}>Favorilerden Çıkar</Text>
@@ -85,6 +90,8 @@ export default function FavoriRestaurantlarim() {
       </View>
     );
   };
+  
+
 
   return (
     <View style={styles.container}>
