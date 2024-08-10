@@ -142,28 +142,34 @@ export default function ResultsShowScreen({ route }) {
   numColumns={2} // burda yan yana iki tane görsel yan yana geliyor.
   renderItem={({ item }) => (
     <View style={styles.productItem}>
-      <View style={styles.imageContainer}> 
-      <TouchableOpacity
-           onPress={() => {
-             navigation.navigate('ProductResult', { id: item._id });
-           }}
-           >
-           <Image source={{ uri: item.image }} style={styles.productImage} />
-         </TouchableOpacity>
+  <View style={styles.imageContainer}> 
+  <TouchableOpacity
+  onPress={() => {
+    navigation.navigate('ProductResult', { 
+      id: item._id,
+      name: item.name,
+      image: item.image,
+      price: item.price 
+    });
+  }}
+>
+  <Image source={{ uri: item.image }} style={styles.productImage} />
+</TouchableOpacity>
 
-        <Icon
-          name="add"
-          size={30}
-          color="red"
-          style={styles.icon}
-          onPress={() => {
-            navigation.navigate('Siparislerim', { id: item._id });
-          }}
-        />
-      </View>
-      <Text style={styles.productName}>{item.name}</Text>
-      <Text style={styles.productPrice}>${item.price}</Text>
-    </View>
+
+    <Icon
+      name="add"
+      size={30}
+      color="red"
+      style={styles.icon}
+      onPress={() => {
+        navigation.navigate('Siparislerim', { id: item._id });
+      }}
+    />
+  </View>
+  <Text style={styles.productName}>{item.name}</Text>
+  <Text style={styles.productPrice}>${item.price}</Text>
+</View>
   )}
 />
       </View>
