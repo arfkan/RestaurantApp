@@ -22,6 +22,7 @@ import ProductResult from './Screens/ProductResult';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 
+
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,13 +38,12 @@ function MainStackNavigator() {
       />
       <Stack.Screen name="ResultsShow" component={ResultsShowScreen} />
       <Stack.Screen name="ProductResult" component={ProductResult} />
+      <Stack.Screen name="Siparislerim" component={ProductResult} />
     </Stack.Navigator>
   );
 }
 
-function DrawerNavigator() {
-  const navigation = useNavigation();
-
+function DrawerNavigator({ navigation }) {
   return (
     <Drawer.Navigator
       initialRouteName="Home"
@@ -79,6 +79,7 @@ function DrawerNavigator() {
     </Drawer.Navigator>
   );
 }
+
 
 export default function App() {
   return (

@@ -1,11 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, ScrollView, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ProductResult({ route }) {
   const { id, name, image, price } = route.params;
 
-  
+  const [selectedOnion, setSelectedOnion] = useState(null);
+  const [selectedSauce, setSelectedSauce] = useState(null);
+  const [selectedDrink, setSelectedDrink] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [note, setNote] = useState(''); 
+
+  const navigation = useNavigation();
+
+  const increaseQuantity = () => {
+    setQuantity(prevQuantity => prevQuantity + 1);
+  };
+
+  const decreaseQuantity = () => {
+    setQuantity(prevQuantity => prevQuantity > 1 ? prevQuantity - 1 : 1);
+  };
+
+  const addToCart = () => {
+    const productDetails = {
+      id,
+      name,
+      image,
+      price,
+      quantity,
+      selectedOnion,
+      selectedSauce,
+      selectedDrink,
+      note,
+    };
+
+    // Navigate to Siparislerim with cart item details
+    navigation.navigate('Siparislerim', { cartItem: productDetails });
+  };
 
   return (
     <View style={styles.container}>
@@ -15,108 +47,97 @@ export default function ProductResult({ route }) {
         <Text style={styles.price}>${price}</Text>
         <Text style={styles.explain}>1 Adet Beef Burger + Patates kızartması(Orta) + Çıtır Soğan(5'li) + 1 adet Cola (1L)</Text>
 
+        {/* Onion Selection */}
         <View style={styles.rectangle}>
           <Text style={styles.choice}>Soğanlı/ Soğansız</Text>
           <Text style={styles.alttitle}>Birini seç</Text>
-          
           <View style={styles.options}>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
+            <TouchableOpacity onPress={() => setSelectedOnion('Soğanlı')} style={styles.optionButton}>
+              <Icon name={selectedOnion === 'Soğanlı' ? "check-circle" : "circle"} size={20} color={selectedOnion === 'Soğanlı' ? 'green' : 'gray'}/>
               <Text style={styles.optionText}>Soğanlı</Text>
-            </View>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setSelectedOnion('Soğansız')} style={styles.optionButton}>
+              <Icon name={selectedOnion === 'Soğansız' ? "check-circle" : "circle"} size={20} color={selectedOnion === 'Soğansız' ? 'green' : 'gray'}/>
               <Text style={styles.optionText}>Soğansız</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
 
+        {/* Sauce Selection */}
         <View style={[styles.rectangle, styles.sosRectangle]}>
           <Text style={styles.choice}>Sos Tercihleri</Text>
           <Text style={styles.alttitle}>Birini seç</Text>
-          
           <View style={styles.optionsColumn}>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
-              <Text style={styles.optionText}>Sos 1</Text>
-            </View>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
-              <Text style={styles.optionText}>Sos 2</Text>
-            </View>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
-              <Text style={styles.optionText}>Sos 3</Text>
-            </View>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
-              <Text style={styles.optionText}>Sos 4</Text>
-            </View>
+            {['Sos 1', 'Sos 2', 'Sos 3', 'Sos 4'].map(option => (
+              <TouchableOpacity key={option} onPress={() => setSelectedSauce(option)} style={styles.optionButton}>
+                <Icon name={selectedSauce === option ? "check-circle" : "circle"} size={20} color={selectedSauce === option ? 'green' : 'gray'}/>
+                <Text style={styles.optionText}>{option}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
+        {/* Drink Selection */}
         <View style={[styles.rectangle, styles.sosRectangle]}>
           <Text style={styles.choice}>İçecek Seçenekleri</Text>
           <Text style={styles.alttitle}>Birini seç</Text>
-          
           <View style={styles.optionsColumn}>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
-              <Text style={styles.optionText}>Coco-cola(1L)</Text>
-            </View>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
-              <Text style={styles.optionText}>Coco-cola Light(1L)</Text>
-            </View>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
-              <Text style={styles.optionText}>Coco-cola Şekersiz(1L)</Text>
-            </View>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
-              <Text style={styles.optionText}>Sprite (1L)</Text>
-            </View>
-            <View style={styles.option}>
-              <Icon name="circle" size={20} color="white" />
-              <Text style={styles.optionText}>Fanta (1L)</Text>
-            </View>
+            {['Coco-cola(1L)', 'Coco-cola Light(1L)', 'Coco-cola Şekersiz(1L)', 'Sprite (1L)', 'Fanta (1L)'].map(option => (
+              <TouchableOpacity key={option} onPress={() => setSelectedDrink(option)} style={styles.optionButton}>
+                <Icon name={selectedDrink === option ? "check-circle" : "circle"} size={20} color={selectedDrink === option ? 'green' : 'gray'}/>
+                <Text style={styles.optionText}>{option}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
+        {/* Product Note */}
         <View style={styles.productRectangle}>
-          <Text style={styles.note}>Ürün Notu</Text>
-          <Text style={styles.alttitle2}>Alerjiniz ya da ürünle ilgili bize aktarmak istediğiniz bir şey varsa bize bildirin.</Text>
+          <View>
+            <Text style={styles.note}>Ürün Notu</Text>
+          </View> 
+          <Text style={styles.alttitle2}>
+            Alerjiniz ya da ürünle ilgili bize aktarmak istediğiniz bir şey varsa bize bildirin.
+          </Text>
           <TextInput 
             style={styles.input} 
             placeholder="Buraya yazın..." 
             multiline 
             numberOfLines={4}
+            value={note}
+            onChangeText={setNote}
           />
         </View>
       </ScrollView>
 
-      {/* Sabit Altta Yer Alan Rectangle */}
+      {/* Quantity and Add to Cart Button */}
       <View style={styles.fixedRectangle}>
-        <Icon name="remove" size={25} color="red" />
-        <Text style={styles.fixedText}>1</Text>
-        <Icon name="add" size={25} color="red" />
+        <TouchableOpacity onPress={decreaseQuantity}>
+          <Icon name="remove" size={25} color="red" />
+        </TouchableOpacity>
+        <Text style={styles.fixedText}>{quantity}</Text>
+        <TouchableOpacity onPress={increaseQuantity}>
+          <Icon name="add" size={25} color="red"/>
+        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Sepete Ekle</Text>
+        <TouchableOpacity style={styles.button} onPress={addToCart}>
+          <Text style={styles.buttonText}>Sepete Kaydet</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
+
 const styles = StyleSheet.create({
-  scrollViewContainer: {
-    flexGrow: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
     padding: 20,
+  },
+  scrollViewContainer: {
+    flexGrow: 1,
+    paddingBottom: 70,
   },
   image: {
     width: '100%',
@@ -162,6 +183,7 @@ const styles = StyleSheet.create({
   alttitle: {
     fontSize: 14,
     marginBottom: 12,
+    marginVertical: 5,
   },
   alttitle2: {
     fontSize: 14,
@@ -176,13 +198,13 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     marginTop: 10,
   },
-  option: {
+  optionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
   },
   optionText: {
-    marginLeft: 5,
+    marginLeft: 10,
     fontSize: 16,
     color: 'black',
   },
@@ -216,10 +238,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'white',
-    padding: 20,
+    padding: 15,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
   },
   fixedText: {
     fontSize: 20,
@@ -232,7 +254,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10, 
+    marginLeft: 10,
   },
   buttonText: {
     color: 'white',

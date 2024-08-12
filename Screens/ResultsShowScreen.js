@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, Platform, ScrollView, ActivityIndicator} from 'react-native';
+import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, Platform, ScrollView, ActivityIndicator, Animated } from 'react-native';
 import axios from 'axios';
 import { AntDesign } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -13,15 +13,96 @@ const BASE_URL = Platform.OS === 'android'
 export default function ResultsShowScreen({ route }) {
   const [sonuc, setSonuc] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [cartItems, setCartItems] = useState([]); // Sepet için state
   const { id } = route.params;
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const navigation = useNavigation(); // Get navigation object
+  const navigation = useNavigation();
 
-  // API'den restoran verilerini çekme işlevi
+  const [quantity, setQuantity] = useState(1);
+  const [counter, setCounter] = useState(0);
+  const [animatedValue] = useState(new Animated.Value(0));
+
+  const increaseQuantity = (product) => {
+    setCartItems(prevItems => {
+      const existingItem = prevItems.find(item => item._id === product._id);
+      if (existingItem) {
+        return prevItems.map(item =>
+          item._id === product._id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [...prevItems, { ...product, quantity: 1 }];
+      }
+    });
+    setCounter(prevCounter => prevCounter + 1);
+    animateIcon();
+  };
+  
+  const navigateToSiparislerim = () => {
+    navigation.navigate('Siparislerim', { cartItems });
+  };
+  
+  
+  const animateIcon = () => {
+    animatedValue.setValue(0);
+    Animated.spring(animatedValue, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const iconTranslateX = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 0],
+  });
+
+  const iconTranslateY = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 0],
+  });
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={styles.cartContainer}>
+      <Animated.View
+  style={[
+    styles.cartIconContainer,
+    {
+      transform: [
+        { translateX: iconTranslateX },
+        { translateY: iconTranslateY }
+      ]
+    }
+  ]}
+>
+<Icon
+  name="shopping-cart"
+  size={30}
+  color="red"
+  onPress={() => {
+    navigation.navigate('Siparislerim', { cartItems }); // Sepet verilerini gönder
+  }}
+/>
+
+  {counter > 0 && (
+    <View style={styles.counterContainer}>
+      <Text style={styles.counterText}>{counter}</Text>
+    </View>
+  )}
+</Animated.View>
+
+        </View>
+      ),
+    });
+  }, [navigation, iconTranslateX, iconTranslateY, counter, cartItems]);
+
   const getSonuc = async () => {
     if (!id) {
       console.error("Geçersiz ID");
@@ -41,7 +122,6 @@ export default function ResultsShowScreen({ route }) {
     }
   };
 
-  // Ürünleri çekme işlevi
   const fetchProducts = async () => {
     try {
       const response = await axios.get(`${BASE_URL}products`);
@@ -137,46 +217,41 @@ export default function ResultsShowScreen({ route }) {
       <View style={styles.productList}>
         <Text style={styles.productListHeader}>Ürünler:</Text>
         <FlatList
-  data={products}
-  keyExtractor={(item) => item._id}
-  numColumns={2} // burda yan yana iki tane görsel yan yana geliyor.
-  renderItem={({ item }) => (
-    <View style={styles.productItem}>
-  <View style={styles.imageContainer}> 
-  <TouchableOpacity
-  onPress={() => {
-    navigation.navigate('ProductResult', { 
-      id: item._id,
-      name: item.name,
-      image: item.image,
-      price: item.price 
-    });
-  }}
->
-  <Image source={{ uri: item.image }} style={styles.productImage} />
-</TouchableOpacity>
-
-
-    <Icon
-      name="add"
-      size={30}
-      color="red"
-      style={styles.icon}
-      onPress={() => {
-        navigation.navigate('Siparislerim', { id: item._id });
-      }}
-    />
-  </View>
-  <Text style={styles.productName}>{item.name}</Text>
-  <Text style={styles.productPrice}>${item.price}</Text>
-</View>
-  )}
-/>
+          data={products}
+          keyExtractor={(item) => item._id}
+          numColumns={2}
+          renderItem={({ item }) => (
+            <View style={styles.productItem}>
+              <View style={styles.imageContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('ProductResult', {
+                      id: item._id,
+                      name: item.name,
+                      image: item.image,
+                      price: item.price
+                    });
+                  }}
+                >
+                  <Image source={{ uri: item.image }} style={styles.productImage} />
+                </TouchableOpacity>
+                <Icon
+                  name="add"
+                  size={30}
+                  color="red"
+                  style={styles.icon}
+                  onPress={() => increaseQuantity(item)}
+                />
+              </View>
+              <Text style={styles.productName}>{item.name}</Text>
+              <Text style={styles.productPrice}>${item.price}</Text>
+            </View>
+          )}
+        />
       </View>
     </ScrollView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -210,11 +285,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize', 
   },
   
-  /*image: {
-    width: 200,
-    height: 200,
-    margin: 5,
-  },*/
+
   productList: {
     marginTop: 20,
   },
