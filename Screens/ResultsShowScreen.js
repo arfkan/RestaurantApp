@@ -5,6 +5,7 @@ import { AntDesign } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useFavorites } from '../context/FavoritesContext';
 import { useNavigation } from '@react-navigation/native';
+import { useCart } from '../context/CartContext';
 
 const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
@@ -21,6 +22,8 @@ export default function ResultsShowScreen({ route }) {
   const [error, setError] = useState(null);
 
   const navigation = useNavigation();
+
+  const { addToCart } = useCart(); // Use cart context
 
   const [quantity, setQuantity] = useState(1);
   const [counter, setCounter] = useState(0);

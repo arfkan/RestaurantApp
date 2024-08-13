@@ -1,17 +1,18 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Platform } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Alert, Platform } from 'react-native';
 import { useFavorites } from '../context/FavoritesContext';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
   : 'http://localhost:5000/api/';
 
+const defaultImage = 'https://example.com/defaultImage.png'; // Varsayılan resim URL'si
 
 export default function FavoriRestaurantlarim() {
-  const { favorites, setFavorites, removeFavorite } = useFavorites();
+  const { favorites, setFavorites } = useFavorites();
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -25,86 +26,77 @@ export default function FavoriRestaurantlarim() {
           console.error('Beklenmeyen veri formatı:', response.data);
         }
       } catch (error) {
-        console.error('Favoriler alınırken hata oluştu:', error);
+        console.error('Favoriler alınırken hata oluştu:', error.response ? error.response.data : error.message);
       }
     };
-
+    
     fetchFavorites();
   }, []);
 
-  const handleRemoveFavorite = async (id) => {
+  const handleDeleteRestaurant = async (id) => {
+    if (!id) {
+      console.error('Invalid restaurant ID');
+      Alert.alert('Hata', 'Geçersiz restaurant ID');
+      return;
+    }
+  
     try {
-      const response = await axios.delete(`${BASE_URL}favorites/${id}`);
-      console.log('API Yanıtı:', response.data);
-      removeFavorite(id);
-    } catch (error) {
-      if (error.response) {
-        console.error('Sunucu Hatası:', error.response.data);
-        alert(`Sunucu Hatası: ${error.response.data.message || 'Bir hata oluştu'}`);
-      } else if (error.request) {
-        console.error('İstek Hatası:', error.request);
-        alert('İstek hatası: Sunucuya ulaşılamıyor.');
-      } else {
-        console.error('Hata:', error.message);
-        alert('Bir hata oluştu: ' + error.message);
+      const response = await fetch(`${BASE_URL}favorites/${userId}/${id}`, { // userId'yi doğru şekilde geçirin
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Network response was not ok: ${response.status} - ${errorText}`);
       }
+  
+      const data = await response.json();
+      console.log('Restaurant silindi:', data);
+      fetchFavorites(); 
+      Alert.alert('Başarılı', 'Restaurant başarıyla silindi');
+    } catch (error) {
+      console.error('Restaurant silinemedi:', error);
+      Alert.alert('Hata', 'Restaurant silinirken bir hata oluştu: ' + error.message);
     }
   };
   
   const renderItem = ({ item }) => {
     const restaurantId = item._id || item.id;
-  
+
     if (!restaurantId) {
-      console.error('Geçersiz item');
+      console.error('Geçersiz item ID');
       return null;
     }
-  
+
     return (
-      <View style={styles.item}>
-        <TouchableOpacity
-          style={styles.restaurantItem}
-          onPress={() => {
-            console.log("Navigating with ID:", restaurantId);
-            navigation.navigate('ResultsShowScreen', { id: restaurantId });
-          }}
-        >
-          <Image 
-            source={{ uri: item.image_url }} 
-            style={styles.image} 
-            onError={(e) => console.log('Image loading error:', e.nativeEvent.error)}
-          />
-          <View style={styles.itemContent}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemPrice}>{item.price}</Text>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                console.log('Butona tıklandı!');
-                handleRemoveFavorite(restaurantId);
-              }}
-            >
-              <Text style={styles.buttonText}>Favorilerden Çıkar</Text>
-            </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.restaurantItem}
+        onPress={() => navigation.navigate('ResultsShowScreen', { id: restaurantId })}
+      >
+        <Image
+          source={{ uri: item.image_url || defaultImage }}
+          style={styles.restaurantImage}
+        />
+        <View style={styles.restaurantInfo}>
+          <Text style={styles.restaurantName}>{item.name}</Text>
+          <View style={styles.iconButtonContainer}>
+            <FontAwesome onPress={() => handleDeleteRestaurant(item._id)} name="trash" size={24} color="black" />
           </View>
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
     );
   };
-  
-
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Favori Restaurantlarım</Text>
-      {favorites && favorites.length > 0 ? (
-        <FlatList
-          data={favorites}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id ? item.id.toString() : Math.random().toString()}
-        />
-      ) : (
-        <Text style={styles.emptyText}>Henüz favori restoran eklenmedi.</Text>
-      )}
+      <FlatList
+        data={favorites}
+        renderItem={renderItem}
+        keyExtractor={(item) => item._id}
+      />
     </View>
   );
 }
@@ -112,53 +104,29 @@ export default function FavoriRestaurantlarim() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  item: {
-    flexDirection: 'row',
-    marginBottom: 16,
+    backgroundColor: '#fff',
   },
   restaurantItem: {
-    flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
-  image: {
+  restaurantImage: {
     width: 100,
     height: 100,
     borderRadius: 8,
   },
-  itemContent: {
+  restaurantInfo: {
     flex: 1,
-    marginLeft: 16,
+    marginLeft: 10,
+    justifyContent: 'center',
   },
-  itemName: {
+  restaurantName: {
     fontSize: 18,
     fontWeight: 'bold',
   },
-  itemPrice: {
-    fontSize: 16,
-    color: 'gray',
-  },
-  button: {
-    marginTop: 8,
-    padding: 8,
-    backgroundColor: 'red',
-    borderRadius: 4,
-  },
-  buttonText: {
-    color: 'white',
-    textAlign: 'center',
-  },
-  emptyText: {
-    fontSize: 18,
-    color: 'gray',
-    textAlign: 'center',
-    marginTop: 20,
+  iconButtonContainer: {
+    marginTop: 10,
   },
 });

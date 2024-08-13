@@ -35,10 +35,10 @@ export default function ProductResult({ route }) {
       note,
     };
 
-    // Navigate to Siparislerim with cart item details
-    navigation.navigate('Siparislerim', { cartItem: productDetails });
+    // Navigate back to Siparislerim with updated product details
+    navigation.navigate('Siparislerim', { updatedCartItem: productDetails });
   };
-
+  
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>

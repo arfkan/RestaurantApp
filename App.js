@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -21,6 +21,7 @@ import ResultDetail  from './components/ResultDetail';
 import ProductResult from './Screens/ProductResult';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
+import { CartProvider, useCart } from './context/CartContext';
 
 
 const Stack = createNativeStackNavigator();
@@ -44,6 +45,7 @@ function MainStackNavigator() {
 }
 
 function DrawerNavigator({ navigation }) {
+  const {cartItems} = useCart();
   return (
     <Drawer.Navigator
       initialRouteName="Home"
@@ -53,23 +55,28 @@ function DrawerNavigator({ navigation }) {
         headerTintColor: 'white',
       }}
     >
-      <Drawer.Screen 
+       <Drawer.Screen 
         name="Home" 
         component={MainStackNavigator} 
         options={{
           headerRight: () => (
-            <Icon 
-              name="shopping-cart" 
-              size={24} 
-              color="white" 
-              style={{ marginRight: 15 }} 
-              onPress={() => {
-                navigation.navigate('Siparislerim'); // 'Siparislerim' sayfasına yönlendirme
-              }}
-            />
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+              <Icon 
+                name="shopping-cart" 
+                size={24} 
+                color="white" 
+                onPress={() => navigation.navigate('Siparislerim')}
+              />
+              {cartItems.length > 0 && (
+                <View style={styles.counterContainer}>
+                  <Text style={styles.counterText}>{cartItems.length}</Text>
+                </View>
+              )}
+            </View>
           ),
         }}
       />
+
       <Drawer.Screen name="Favori Restaurantlarım" component={FavoriRestaurantlarim} />
       <Drawer.Screen name="Siparişlerim" component={Siparislerim} />
       <Drawer.Screen name="Adreslerim" component={Adreslerim} />
@@ -81,31 +88,46 @@ function DrawerNavigator({ navigation }) {
 }
 
 
+
 export default function App() {
   return (
     <FavoritesProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Welcome">
-          <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />
-          <Stack.Screen name="ResultsShowScreen" component={ResultsShowScreen} />
-          <Stack.Screen name="FavoriRestaurantlarim" component={FavoriRestaurantlarim} />
-          <Stack.Screen name="Siparislerim" component={Siparislerim} />
-          <Stack.Screen name="ProductResult" component={ProductResult} />
-        </Stack.Navigator>
-        <StatusBar style="auto" />
-      </NavigationContainer>
+      <CartProvider> 
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Welcome">
+            <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />
+            <Stack.Screen name="ResultsShowScreen" component={ResultsShowScreen} />
+            <Stack.Screen name="FavoriRestaurantlarim" component={FavoriRestaurantlarim} />
+            <Stack.Screen name="Siparislerim" component={Siparislerim} />
+            <Stack.Screen name="ProductResult" component={ProductResult} />
+          </Stack.Navigator>
+          <StatusBar style="auto" />
+        </NavigationContainer>
+      </CartProvider>
     </FavoritesProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
+  counterContainer: {
+    position: 'absolute',
+    top: -10,
+    right: -10,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  counterText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
 });
+
+ 

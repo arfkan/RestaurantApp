@@ -3,6 +3,7 @@ import { View, Text, Button, StyleSheet, TextInput, Platform, FlatList, Touchabl
 import Fontisto from '@expo/vector-icons/Fontisto';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
+import DropdownComponent from '../Screens/dropdown'; 
 
 const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
@@ -10,11 +11,11 @@ const BASE_URL = Platform.OS === 'android'
 
 export default function Adreslerim({ navigation }) {
   const [addresses, setAddresses] = useState([]);
-  const [city, setCity] = useState('');
-  const [district, setDistrict] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
   const [street, setStreet] = useState('');
   const [doorNumber, setDoorNumber] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
 
   useEffect(() => {
     fetchAddresses();
@@ -31,51 +32,37 @@ export default function Adreslerim({ navigation }) {
 
   const handleAddAddressAndNavigate = async () => {
     const newAddress = {
-      city,
-      district,
+      city: selectedCity,
+      district: selectedDistrict,
       neighborhood,
       street,
       doorNumber,
-      userId: '45TPJloYrCSCnSg1XktWjdEpLAO2', // userId'yi ekledik burda ve userId geliyor veritabanına
+      userId: '45TPJloYrCSCnSg1XktWjdEpLAO2',
     };
   
     try {
       await axios.post(`${BASE_URL}adreses`, newAddress);
-  
-      setCity('');
-      setDistrict('');
+      // Reset form fields
+      setSelectedCity('');
+      setSelectedDistrict('');
       setNeighborhood('');
       setStreet('');
       setDoorNumber('');
-      fetchAddresses(); // Adresleri yeniden yükle
+      // Refetch addresses
+      fetchAddresses();
     } catch (error) {
       console.error('Adres eklenirken hata:', error.response ? error.response.data : error.message);
     }
   };
   
-  // BURDA DELETE HATASI ALDIM BUNU ÇÖZ İLK ÖNCE 
-  const handleRemoveAdres = async (id) => {
+  const handleRemoveAdres = async (adresId) => {
     try {
-      await axios.delete(`${BASE_URL}adreses/${id}`);
+      await axios.delete(`${BASE_URL}adreses/${adresId}`);
       fetchAddresses(); // Adresleri yeniden yükle
     } catch (error) {
       console.error('Adres silinirken hata:', error.response ? error.response.data : error.message);
     }
   };
-  
-  
-
-  const renderAddressItem = ({ item }) => (
-    <View style={styles.addressItem}>
-      <Icon style={styles.home} name="home" size={24} color="red" />
-      <Text style={styles.addressText}>
-        {item.city}, {item.district}, {item.neighborhood}, {item.street}, {item.doorNumber}
-      </Text>
-      <TouchableOpacity onPress={() => handleRemoveAdres(item._id)}>
-        <Icon name="trash" size={20} color="gray" />
-      </TouchableOpacity>
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -83,25 +70,41 @@ export default function Adreslerim({ navigation }) {
         <Text style={styles.headerText}>Kayıtlı Adreslerim</Text>
         <FlatList
           data={addresses}
-          renderItem={renderAddressItem}
-          keyExtractor={(item) => item._id ? item._id.toString() : Math.random().toString()}
-          style={styles.addressList}
+          renderItem={({ item }) => (
+            <View style={styles.addressItem}>
+              <Text style={styles.addressText}>{item.city}, {item.district}, {item.neighborhood}, {item.street}, {item.doorNumber}</Text>
+              <TouchableOpacity onPress={() => handleRemoveAdres(item._id)}>
+                <Icon name="trash" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+          )}
+          keyExtractor={(item) => item._id}
         />
       </View>
 
       <View style={styles.addAddressContainer}>
         <Text style={styles.headerText}>Yeni Adres Ekle</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Şehir Seçin"
-          value={city}
-          onChangeText={setCity}
+        
+        <DropdownComponent
+          style={styles.dropDesign}
+          selectedCity={selectedCity}
+          setSelectedCity={setSelectedCity}
+          selectedDistrict={selectedDistrict}
+          setSelectedDistrict={setSelectedDistrict}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="İlçe Seçin"
-          value={district}
-          onChangeText={setDistrict}
+        <DropdownComponent
+          style={styles.dropDesign}
+          selectedCity={selectedCity}
+          setSelectedCity={setSelectedCity}
+          selectedDistrict={selectedDistrict}
+          setSelectedDistrict={setSelectedDistrict}
+        />
+        <DropdownComponent
+          style={styles.dropDesign}
+          selectedCity={selectedCity}
+          setSelectedCity={setSelectedCity}
+          selectedDistrict={selectedDistrict}
+          setSelectedDistrict={setSelectedDistrict}
         />
         <TextInput
           style={styles.input}
@@ -141,19 +144,18 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   addressListContainer: {
-    flex: 3,  
-    marginBottom: 20,
+    flex: 3,
+    marginBottom: 25,
   },
   addAddressContainer: {
-    flex: 10,  
+    flex: 7,
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 15,  
+    padding: 15,
     elevation: 5,
-    justifyContent: 'center', 
   },
   headerText: {
-    fontSize: 18, 
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#333',
@@ -161,7 +163,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
-    padding: 5,  
+    padding: 10,
     marginBottom: 8,
     borderRadius: 5,
     backgroundColor: '#fff',
@@ -171,10 +173,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 8,
-    elevation: 3,
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 5,
   },
   addressText: {
     flex: 1,
@@ -183,7 +185,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: '#007BFF',
-    padding: 12,  
+    padding: 12,
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 8,
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 12,  
+    padding: 12,
     borderRadius: 5,
     backgroundColor: '#FFD700',
   },
@@ -206,11 +208,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  addressList: {
-    marginTop: 10,
-  },
-  home: {
-    paddingRight: 10,
+  dropDesign: {
+    marginBottom: 12, 
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 10,
+    backgroundColor: '#fff',
   },
 });
-

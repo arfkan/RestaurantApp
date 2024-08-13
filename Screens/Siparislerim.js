@@ -2,38 +2,45 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+
 export default function Siparislerim({ route }) {
   const [cartItems, setCartItems] = useState([]);
   const navigation = useNavigation();
 
+  
+
   useEffect(() => {
     if (route.params?.cartItems) {
       setCartItems(route.params.cartItems);
-       // setCartItems(prevItems => [...prevItems, route.params.cartItem]); 
     }
-  }, [route.params?.cartItems]);
-
-  if (cartItems.length === 0) {
-    return (
-      <View style={styles.container}>
-        <Text>Sepetiniz boş.</Text>
-      </View>
-    );
-  }
-
-  const handlePayment = () => {
-    console.log('Ödeme yapılacak');
-  };
+    if (route.params?.updatedCartItem) {
+      const updatedItem = route.params.updatedCartItem;
+      setCartItems(prevItems => {
+        const itemIndex = prevItems.findIndex(item => item.id === updatedItem.id);
+        if (itemIndex !== -1) {
+          const newItems = [...prevItems];
+          newItems[itemIndex] = updatedItem;
+          return newItems;
+        } else {
+          return [...prevItems, updatedItem];
+        }
+      });
+    }
+  }, [route.params?.cartItems, route.params?.updatedCartItem]);
 
   const handleDetail = (item) => {
-    
     navigation.navigate('ProductResult', { 
-      id: item._id,
+      id: item.id,  
       name: item.name,
       image: item.image,
       price: item.price
-     
-    }); 
+    });
+  };
+
+  // Ödeme işlemi butonu için onPress işlevi
+  const handlePayment = () => {
+    // Ödeme işlemi burada gerçekleşecek
+    console.log('Ödeme işlemi tamamlandı');
   };
 
   return (
@@ -48,10 +55,10 @@ export default function Siparislerim({ route }) {
               <Text style={styles.itemName}>{item.name}</Text>
               <Text>Fiyat: ${item.price}</Text>
               <Text>Adet: {item.quantity}</Text>
-              <Text>Soğan Tercihi: {item.selectedOnion ? item.selectedOnion : 'Seçilmedi'}</Text>
-              <Text>Sos Tercihi: {item.selectedSauce ? item.selectedSauce : 'Seçilmedi'}</Text>
-              <Text>İçecek Tercihi: {item.selectedDrink ? item.selectedDrink : 'Seçilmedi'}</Text>
-              <Text>Ürün Notu: {item.note ? item.note : 'Yok'}</Text>
+              <Text>Soğan Tercihi: {item.selectedOnion || 'Seçilmedi'}</Text>
+              <Text>Sos Tercihi: {item.selectedSauce || 'Seçilmedi'}</Text>
+              <Text>İçecek Tercihi: {item.selectedDrink || 'Seçilmedi'}</Text>
+              <Text>Ürün Notu: {item.note || 'Yok'}</Text>
 
               <TouchableOpacity style={styles.detailButton} onPress={() => handleDetail(item)}>
                 <Text style={styles.detailButtonText}>Ürün Detaylarına Git</Text>
@@ -60,10 +67,9 @@ export default function Siparislerim({ route }) {
           </View>
         )}
       />
-      
       <View style={styles.fixedRectangle}>
         <TouchableOpacity style={styles.paymentButton} onPress={handlePayment}>
-          <Text style={styles.paymentButtonText}>Sepeti Onayla</Text>
+          <Text style={styles.paymentButtonText}>Ödeme İşlemini Tamamla</Text>
         </TouchableOpacity>
       </View>
     </View>
