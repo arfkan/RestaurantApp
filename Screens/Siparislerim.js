@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useCart } from '../context/CartContext';
 
 
 export default function Siparislerim({ route }) {
-  const [cartItems, setCartItems] = useState([]);
+   const {cartItems} = useCart(); // burda da aşağıyı alınca yorum satırına resultShow ekranından girilmiyor siparislerim sayfama
   const navigation = useNavigation();
-
+  // const [cartItems, setCartItems]= useState([]); // setCartItems hatasını burda çözdüm yukaıyı yorum satırına alarak.
   
-
   useEffect(() => {
     if (route.params?.cartItems) {
       setCartItems(route.params.cartItems);
@@ -39,8 +39,7 @@ export default function Siparislerim({ route }) {
 
   // Ödeme işlemi butonu için onPress işlevi
   const handlePayment = () => {
-    // Ödeme işlemi burada gerçekleşecek
-    console.log('Ödeme işlemi tamamlandı');
+    navigation.navigate('Payment', {cartItems: cartItems});
   };
 
   return (

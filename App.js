@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -22,6 +22,8 @@ import ProductResult from './Screens/ProductResult';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { CartProvider, useCart } from './context/CartContext';
+import Payment from './Screens/Payment';
+import LastPayment from './Screens/LastPayment';
 
 
 const Stack = createNativeStackNavigator();
@@ -88,7 +90,6 @@ function DrawerNavigator({ navigation }) {
 }
 
 
-
 export default function App() {
   return (
     <FavoritesProvider>
@@ -103,6 +104,8 @@ export default function App() {
             <Stack.Screen name="FavoriRestaurantlarim" component={FavoriRestaurantlarim} />
             <Stack.Screen name="Siparislerim" component={Siparislerim} />
             <Stack.Screen name="ProductResult" component={ProductResult} />
+            <Stack.Screen name="Payment" component={Payment} />
+            <Stack.Screen name="LastPayment" component={LastPayment} />
           </Stack.Navigator>
           <StatusBar style="auto" />
         </NavigationContainer>

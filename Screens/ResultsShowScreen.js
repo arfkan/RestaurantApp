@@ -7,6 +7,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import { useNavigation } from '@react-navigation/native';
 import { useCart } from '../context/CartContext';
 
+
 const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
   : 'http://localhost:5000/api/';
@@ -14,7 +15,7 @@ const BASE_URL = Platform.OS === 'android'
 export default function ResultsShowScreen({ route }) {
   const [sonuc, setSonuc] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [cartItems, setCartItems] = useState([]); // Sepet için state
+  const { cartItems, addToCart } = useCart();
   const { id } = route.params;
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const [products, setProducts] = useState([]);
@@ -23,33 +24,24 @@ export default function ResultsShowScreen({ route }) {
 
   const navigation = useNavigation();
 
-  const { addToCart } = useCart(); // Use cart context
 
   const [quantity, setQuantity] = useState(1);
   const [counter, setCounter] = useState(0);
   const [animatedValue] = useState(new Animated.Value(0));
 
+
+
   const increaseQuantity = (product) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item._id === product._id);
-      if (existingItem) {
-        return prevItems.map(item =>
-          item._id === product._id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        return [...prevItems, { ...product, quantity: 1 }];
-      }
-    });
+    addToCart(product);
     setCounter(prevCounter => prevCounter + 1);
     animateIcon();
   };
+
   
-  const navigateToSiparislerim = () => {
+ /* const navigateToSiparislerim = () => {
     navigation.navigate('Siparislerim', { cartItems });
   };
-  
+  */
   
   const animateIcon = () => {
     animatedValue.setValue(0);
@@ -74,37 +66,35 @@ export default function ResultsShowScreen({ route }) {
     navigation.setOptions({
       headerRight: () => (
         <View style={styles.cartContainer}>
-      <Animated.View
-  style={[
-    styles.cartIconContainer,
-    {
-      transform: [
-        { translateX: iconTranslateX },
-        { translateY: iconTranslateY }
-      ]
-    }
-  ]}
->
-<Icon
-  name="shopping-cart"
-  size={30}
-  color="red"
-  onPress={() => {
-    navigation.navigate('Siparislerim', { cartItems }); // Sepet verilerini gönder
-  }}
-/>
-
-  {counter > 0 && (
-    <View style={styles.counterContainer}>
-      <Text style={styles.counterText}>{counter}</Text>
-    </View>
-  )}
-</Animated.View>
-
+          <Animated.View
+            style={[
+              styles.cartIconContainer,
+              {
+                transform: [
+                  { translateX: iconTranslateX },
+                  { translateY: iconTranslateY }
+                ]
+              }
+            ]}
+          >
+            <Icon
+              name="shopping-cart"
+              size={30}
+              color="red"
+              onPress={() => {
+                navigation.navigate('Siparislerim', { cartItems });
+              }}
+            />
+            {cartItems.length > 0 && (
+              <View style={styles.counterContainer}>
+                <Text style={styles.counterText}>{cartItems.length}</Text>
+              </View>
+            )}
+          </Animated.View>
         </View>
       ),
     });
-  }, [navigation, iconTranslateX, iconTranslateY, counter, cartItems]);
+  }, [navigation, iconTranslateX, iconTranslateY, cartItems]);
 
   const getSonuc = async () => {
     if (!id) {
