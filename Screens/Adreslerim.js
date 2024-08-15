@@ -89,22 +89,19 @@ export default function Adreslerim({ navigation }) {
           style={styles.dropDesign}
           selectedCity={selectedCity}
           setSelectedCity={setSelectedCity}
-          selectedDistrict={selectedDistrict}
-          setSelectedDistrict={setSelectedDistrict}
+          
+        />
+        <DropdownComponent
+          style={styles.dropDesign}
+          selectedCity={selectedDistrict}
+          setSelectedCity={setSelectedDistrict}
+         
         />
         <DropdownComponent
           style={styles.dropDesign}
           selectedCity={selectedCity}
           setSelectedCity={setSelectedCity}
-          selectedDistrict={selectedDistrict}
-          setSelectedDistrict={setSelectedDistrict}
-        />
-        <DropdownComponent
-          style={styles.dropDesign}
-          selectedCity={selectedCity}
-          setSelectedCity={setSelectedCity}
-          selectedDistrict={selectedDistrict}
-          setSelectedDistrict={setSelectedDistrict}
+        
         />
         <TextInput
           style={styles.input}

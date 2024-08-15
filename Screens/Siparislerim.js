@@ -5,10 +5,10 @@ import { useCart } from '../context/CartContext';
 
 
 export default function Siparislerim({ route }) {
-   const {cartItems} = useCart(); // burda da aşağıyı alınca yorum satırına resultShow ekranından girilmiyor siparislerim sayfama
+  const {cartItems, setCartItems} = useCart(); // burda hatayı çözdük setCartItems ı bunu CartContext.Provider içinde yazdık
   const navigation = useNavigation();
-  // const [cartItems, setCartItems]= useState([]); // setCartItems hatasını burda çözdüm yukaıyı yorum satırına alarak.
   
+
   useEffect(() => {
     if (route.params?.cartItems) {
       setCartItems(route.params.cartItems);

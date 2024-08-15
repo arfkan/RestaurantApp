@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Alert, Platform } from 'react-native';
 import { useFavorites } from '../context/FavoritesContext';
 import axios from 'axios';
@@ -9,65 +9,69 @@ const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
   : 'http://localhost:5000/api/';
 
-const defaultImage = 'https://example.com/defaultImage.png'; // Varsayılan resim URL'si
+const defaultImage = 'https://example.com/defaultImage.png';
+
+const userId = '45TPJloYrCSCnSg1XktWjdEpLAO2'; 
 
 export default function FavoriRestaurantlarim() {
-  const { favorites, setFavorites } = useFavorites();
+  const { favorites, setFavorites, removeFavorite } = useFavorites();
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}favorites/45TPJloYrCSCnSg1XktWjdEpLAO2`);
-        console.log('API Yanıtı:', response.data);
-        if (Array.isArray(response.data)) {
-          setFavorites(response.data.map(fav => fav.restaurant || fav));
-        } else {
-          console.error('Beklenmeyen veri formatı:', response.data);
-        }
-      } catch (error) {
-        console.error('Favoriler alınırken hata oluştu:', error.response ? error.response.data : error.message);
+  const fetchFavorites = useCallback(async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}favorites/${userId}`);
+      console.log('API Yanıtı:', response.data);
+      if (Array.isArray(response.data)) {
+        setFavorites(response.data.map(fav => fav.restaurant || fav));
+      } else {
+        console.error('Beklenmeyen veri formatı:', response.data);
       }
-    };
-    
-    fetchFavorites();
-  }, []);
+    } catch (error) {
+      console.error('Favoriler alınırken hata oluştu:', error.response ? error.response.data : error.message);
+    }
+  }, [setFavorites]);
 
-  const handleDeleteRestaurant = async (id) => {
-    if (!id) {
-      console.error('Invalid restaurant ID');
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
+
+  const handleDeleteRestaurant = async (restaurantId) => {
+    if (!restaurantId) {
+      console.error('Geçersiz restaurant ID');
       Alert.alert('Hata', 'Geçersiz restaurant ID');
       return;
     }
   
     try {
-      const response = await fetch(`${BASE_URL}favorites/${userId}/${id}`, { // userId'yi doğru şekilde geçirin
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Network response was not ok: ${response.status} - ${errorText}`);
-      }
-  
-      const data = await response.json();
-      console.log('Restaurant silindi:', data);
-      fetchFavorites(); 
+      const response = await axios.delete(`${BASE_URL}favorites/${userId}/${restaurantId}`);
+      console.log('Restaurant silindi:', response.data);
+      await fetchFavorites();
       Alert.alert('Başarılı', 'Restaurant başarıyla silindi');
     } catch (error) {
       console.error('Restaurant silinemedi:', error);
-      Alert.alert('Hata', 'Restaurant silinirken bir hata oluştu: ' + error.message);
+  
+      // Hatanın nedenini daha iyi anlamak için hata mesajını genişletelim
+      if (error.response) {
+        console.error('Error data:', error.response.data);
+        console.error('Error status:', error.response.status);
+        console.error('Error headers:', error.response.headers);
+        Alert.alert('Hata', `Restaurant silinirken bir hata oluştu: ${error.response.data}`);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+        Alert.alert('Hata', 'Sunucuya ulaşılamadı');
+      } else {
+        console.error('Error message:', error.message);
+        Alert.alert('Hata', `Bir hata oluştu: ${error.message}`);
+      }
     }
   };
   
+
   const renderItem = ({ item }) => {
     const restaurantId = item._id || item.id;
 
     if (!restaurantId) {
-      console.error('Geçersiz item ID');
+      console.error('Geçersiz item ID', item);
       return null;
     }
 
@@ -83,7 +87,7 @@ export default function FavoriRestaurantlarim() {
         <View style={styles.restaurantInfo}>
           <Text style={styles.restaurantName}>{item.name}</Text>
           <View style={styles.iconButtonContainer}>
-            <FontAwesome onPress={() => handleDeleteRestaurant(item._id)} name="trash" size={24} color="black" />
+            <FontAwesome onPress={() => handleDeleteRestaurant(restaurantId)} name="trash" size={24} color="black" />
           </View>
         </View>
       </TouchableOpacity>
@@ -95,7 +99,7 @@ export default function FavoriRestaurantlarim() {
       <FlatList
         data={favorites}
         renderItem={renderItem}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item) => item._id || item.id}
       />
     </View>
   );
@@ -104,29 +108,31 @@ export default function FavoriRestaurantlarim() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    padding: 10,
   },
   restaurantItem: {
     flexDirection: 'row',
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    marginBottom: 10,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 10,
   },
   restaurantImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
+    width: 80,
+    height: 80,
+    borderRadius: 10,
   },
   restaurantInfo: {
-    flex: 1,
     marginLeft: 10,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    flex: 1,
   },
   restaurantName: {
     fontSize: 18,
     fontWeight: 'bold',
   },
   iconButtonContainer: {
-    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
 });
