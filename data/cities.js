@@ -1,11 +1,4 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Modal, FlatList } from 'react-native';
-import AntDesign from '@expo/vector-icons/AntDesign';
- 
-
-
-
-const data = [
+export const cities = [
     { label: 'ADANA', value: 'ADANA' },
     { label: 'ADIYAMAN', value: 'ADIYAMAN' },
     { label: 'AFYONKARAHİSAR', value: 'AFYONKARAHİSAR' },
@@ -88,7 +81,7 @@ const data = [
     { label: 'OSMANİYE', value: 'OSMANİYE' },
     { label: 'DÜZCE', value: 'DÜZCE' },
   ];
-  export const districts = {
+export const districts = {
     ADANA: [
       { label: 'ALADAĞ', value: 'ALADAĞ' },
       { label: 'CEYHAN', value: 'CEYHAN' },
@@ -608,138 +601,25 @@ const data = [
         { label: 'TOROSLAR', value: 'TOROSLAR' },
         { label: 'YENİŞEHİR', value: 'YENİŞEHİR' },
       ],
+     
+      
     }
 
-const DropdownInTextInput = () => {
-  const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const [selectedCity, setSelectedCity] = useState('');
-
-  const [searchText, setSearchText] = useState('');
-
-  
-  const filteredData = data.filter(city =>
-    city.label.toLowerCase().includes(searchText.toLowerCase())
-  );
-
-  const filteredDistrictsByCity = (value) => {
-    const filteredDistrict = districts[value]
-    console.log(filteredDistrict);
-    
-    // console.log(filteredDistrict);
-    
-  }
-
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.inputContainer}
-        onPress={() => setDropdownVisible(true)}
-      >
-         <TextInput
-          style={styles.textInput}s
-          value={selectedCity}
-          placeholder="Şehir"
-          editable={false}
-        />
-           <TextInput
-          style={styles.textInput}s
-          value={selectedCity}
-          placeholder="İlçe Seç"
-          editable={false}
-        />
-        <AntDesign name="down" size={20} color="black" />
-      </TouchableOpacity>
-
-      {isDropdownVisible && (
-        <Modal
-          transparent
-          animationType="slide"
-          visible={isDropdownVisible}
-          onRequestClose={() => setDropdownVisible(false)}
-        >
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search..."
-                value={searchText}
-                onChangeText={setSearchText}
-              />
-              <FlatList
-                data={filteredData}
-                keyExtractor={(item) => item.value}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.item}
-                    onPress={() => {
-                      setSelectedCity(item.label);
-                      filteredDistrictsByCity(item.label);
-                      
-                      console.log(item.label);
-                      
-                      // handlePickingCity(item.label)
-                      setDropdownVisible(false);
-                      setSearchText('');
-                    }}
-                  >
-                    <Text style={styles.itemText}>{item.label}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          </View>
-        </Modal>
-      )}
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: 'gray',
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    height: 50,
-  },
-  textInput: {
-    flex: 1,
-    fontSize: 16,
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContainer: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 16,
-  },
-  searchInput: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-  },
-  item: {
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-  },
-  itemText: {
-    fontSize: 16,
-  },
-});
-
-export default DropdownInTextInput;
+    export const neighborhoods = {
+        ÇANKAYA: [
+            { label: 'Aydınlıkevler', value: 'AYDINLIKEVLER' },
+            { label: 'Bahçelievler', value: 'BAHCELIEVLER' },
+            { label: 'Balgat', value: 'BALGAT' },
+            { label: 'Çankaya', value: 'ÇANKAYA' },
+            { label: 'Çayyolu', value: 'ÇAYYOLU' },
+            { label: 'Cevizlidere', value: 'CEVIZLIDERE' },
+            { label: 'Dikmen', value: 'DIKMEN' },
+            { label: 'Esenboğa', value: 'ESENBOGA' },
+            { label: 'İncesu', value: 'INCESU' },
+            { label: 'Kocatepe', value: 'KOCATEPE' },
+            { label: 'Kızılay', value: 'KIZILAY' },
+            { label: 'Oran', value: 'ORAN' },
+            { label: 'Ümitköy', value: 'UMITKOY' },
+            { label: 'Yıldız', value: 'YILDIZ' }
+        ]
+    }

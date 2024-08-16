@@ -22,6 +22,7 @@ import { CartProvider, useCart } from './context/CartContext';
 import Payment from './Screens/Payment';
 import LastPayment from './Screens/LastPayment';
 import CardInfoScreen from './Screens/CardInfoScreen';
+import Adreslerim2 from './Screens/Adreslerim2';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -37,6 +38,7 @@ function MainStackNavigator() {
       <Stack.Screen name="ResultsShow" component={ResultsShowScreen} />
       <Stack.Screen name="ProductResult" component={ProductResult} />
       <Stack.Screen name="Siparislerim" component={Siparislerim} />
+      <Stack.Screen name="ResultsShowScreen" component={ResultsShowScreen} />
     </Stack.Navigator>
   );
 }
@@ -75,9 +77,11 @@ function DrawerNavigator() {
         })}
       />
       <Drawer.Screen name="Favori Restaurantlarım" component={FavoriRestaurantlarim} />
-      <Drawer.Screen name="Adreslerim" component={Adreslerim} />
+      {/* <Drawer.Screen name="Adreslerim" component={Adreslerim} /> */}
+      <Drawer.Screen name="Adreslerim" component={Adreslerim2} />
       <Drawer.Screen name="Admin Paneli" component={AdminScreen} />
       <Drawer.Screen name="Map" component={MapScreen} />
+      <Drawer.Screen name="Siparislerim" component={Siparislerim} />
     </Drawer.Navigator>
   );
 }
@@ -91,10 +95,12 @@ export default function App() {
             <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />
+            <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />     
             <Stack.Screen name="Payment" component={Payment} />
             <Stack.Screen name="LastPayment" component={LastPayment} />
             <Stack.Screen name="CardInfoScreen" component={CardInfoScreen} />
+            <Stack.Screen name="Siparislerim" component={Siparislerim} />
+            
           </Stack.Navigator>
           <StatusBar style="auto" />
         </NavigationContainer>

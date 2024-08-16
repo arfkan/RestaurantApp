@@ -41,31 +41,44 @@ export default function FavoriRestaurantlarim() {
       Alert.alert('Hata', 'Geçersiz restaurant ID');
       return;
     }
-  
-    try {
-      const response = await axios.delete(`${BASE_URL}favorites/${userId}/${restaurantId}`);
-      console.log('Restaurant silindi:', response.data);
-      await fetchFavorites();
-      Alert.alert('Başarılı', 'Restaurant başarıyla silindi');
-    } catch (error) {
-      console.error('Restaurant silinemedi:', error);
-  
-      // Hatanın nedenini daha iyi anlamak için hata mesajını genişletelim
-      if (error.response) {
-        console.error('Error data:', error.response.data);
-        console.error('Error status:', error.response.status);
-        console.error('Error headers:', error.response.headers);
-        Alert.alert('Hata', `Restaurant silinirken bir hata oluştu: ${error.response.data}`);
-      } else if (error.request) {
-        console.error('Error request:', error.request);
-        Alert.alert('Hata', 'Sunucuya ulaşılamadı');
-      } else {
-        console.error('Error message:', error.message);
-        Alert.alert('Hata', `Bir hata oluştu: ${error.message}`);
-      }
-    }
+
+    Alert.alert(
+      'Silme Onayı',
+      'Bu restoranı silmek istediğinizden emin misiniz?',
+      [
+        {
+          text: 'Hayır',
+          onPress: () => console.log('Silme iptal edildi'),
+          style: 'cancel',
+        },
+        {
+          text: 'Evet',
+          onPress: async () => {
+            try {
+              const response = await axios.delete(`${BASE_URL}favorites/${userId}/${restaurantId}`);
+              console.log('Restaurant silindi:', response.data);
+              await fetchFavorites();
+              Alert.alert('Başarılı', 'Restaurant başarıyla silindi');
+            } catch (error) {
+              console.error('Restaurant silinemedi:', error);
+              if (error.response) {
+                console.error('Error data:', error.response.data);
+                console.error('Error status:', error.response.status);
+                console.error('Error headers:', error.response.headers);
+                Alert.alert('Hata', `Restaurant silinirken bir hata oluştu: ${error.response.data}`);
+              } else if (error.request) {
+                console.error('Error request:', error.request);
+                Alert.alert('Hata', 'Sunucuya ulaşılamadı');
+              } else {
+                console.error('Error message:', error.message);
+                Alert.alert('Hata', `Bir hata oluştu: ${error.message}`);
+              }
+            }
+          },
+        },
+      ]
+    );
   };
-  
 
   const renderItem = ({ item }) => {
     const restaurantId = item._id || item.id;

@@ -3,7 +3,8 @@ import { View, Text, Button, StyleSheet, TextInput, Platform, FlatList, Touchabl
 import Fontisto from '@expo/vector-icons/Fontisto';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import DropdownComponent from '../Screens/dropdown'; 
+import DropdownInTextInput from './dropdown';
+import {data, districts} from './dropdown';
 
 const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
@@ -16,6 +17,7 @@ export default function Adreslerim({ navigation }) {
   const [doorNumber, setDoorNumber] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [districtData, setDistrictData] = useState([]);
 
   useEffect(() => {
     fetchAddresses();
@@ -42,13 +44,12 @@ export default function Adreslerim({ navigation }) {
   
     try {
       await axios.post(`${BASE_URL}adreses`, newAddress);
-      // Reset form fields
       setSelectedCity('');
       setSelectedDistrict('');
       setNeighborhood('');
       setStreet('');
       setDoorNumber('');
-      // Refetch addresses
+      // Adresleri yeniden yükle
       fetchAddresses();
     } catch (error) {
       console.error('Adres eklenirken hata:', error.response ? error.response.data : error.message);
@@ -84,24 +85,19 @@ export default function Adreslerim({ navigation }) {
 
       <View style={styles.addAddressContainer}>
         <Text style={styles.headerText}>Yeni Adres Ekle</Text>
-        
-        <DropdownComponent
-          style={styles.dropDesign}
-          selectedCity={selectedCity}
-          setSelectedCity={setSelectedCity}
-          
+
+        <TextInput
+          style={styles.input}
+          placeholder="Şehir Seçin "
+          value={setSelectedCity}
+          onChangeText={setSelectedCity}
         />
-        <DropdownComponent
-          style={styles.dropDesign}
-          selectedCity={selectedDistrict}
-          setSelectedCity={setSelectedDistrict}
          
-        />
-        <DropdownComponent
-          style={styles.dropDesign}
-          selectedCity={selectedCity}
-          setSelectedCity={setSelectedCity}
-        
+        <TextInput
+          style={styles.input}
+          placeholder="İlçe Seçin"
+          value={setSelectedDistrict}
+          onChangeText={setSelectedDistrict}
         />
         <TextInput
           style={styles.input}
@@ -138,7 +134,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f7f7f7',
-    padding: 20,
+    padding: 30,
   },
   addressListContainer: {
     flex: 3,
@@ -148,7 +144,7 @@ const styles = StyleSheet.create({
     flex: 7,
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 15,
+    padding: 25,
     elevation: 5,
   },
   headerText: {

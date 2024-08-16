@@ -63,28 +63,45 @@ export default function AdminScreen() {
   };
 
   const handleDeleteRestaurant = async (id) => {
-    try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
+    Alert.alert(
+      'Silme Onayı',
+      'Bu restoranı silmek istediğinizden emin misiniz?',
+      [
+        {
+          text: 'Hayır',
+          onPress: () => console.log('Silme iptal edildi'),
+          style: 'cancel',
         },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Network response was not ok: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      console.log('Restaurant silindi:', data);
-      fetchData(); 
-      Alert.alert('Başarılı', 'Restaurant başarıyla silindi');
-    } catch (error) {
-      console.error('Restaurant silinemedi:', error);
-      Alert.alert('Hata', 'Restaurant silinirken bir hata oluştu: ' + error.message);
-    }
+        {
+          text: 'Evet',
+          onPress: async () => {
+            try {
+              const response = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+  
+              if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Network response was not ok: ${response.status} - ${errorText}`);
+              }
+  
+              const data = await response.json();
+              console.log('Restaurant silindi:', data);
+              await fetchData(); 
+              Alert.alert('Başarılı', 'Restaurant başarıyla silindi');
+            } catch (error) {
+              console.error('Restaurant silinemedi:', error);
+              Alert.alert('Hata', 'Restaurant silinirken bir hata oluştu: ' + error.message);
+            }
+          },
+        },
+      ]
+    );
   };
+  
 
   const renderRestaurantItem = ({ item }) => (
     <TouchableOpacity

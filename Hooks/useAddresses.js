@@ -11,22 +11,33 @@ export const useAddresses = () => {
 
   const fetchAddresses = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}adreses`);
+      const response = await axios.get(`${BASE_URL}addresses`);
       setAddresses(response.data);
     } catch (error) {
       console.error('Error fetching addresses:', error);
     }
   };
+  
 
   const addAddress = async (newAddress) => {
     try {
-      const response = await axios.post(`${BASE_URL}adreses`, newAddress);
-      setAddresses([...addresses, response.data]);
+      const response = await axios.post(`${BASE_URL}addresses`, newAddress);
+      setAddresses((prevAddresses) => [...prevAddresses, response.data]);
     } catch (error) {
-      console.error('Error adding address:', error);
-      throw error;
+      if (error.response) {
+
+        console.error('Sunucu hatası:', error.response.data);
+      } else if (error.request) {
+     
+        console.error('Sunucudan yanıt alınamadı:', error.request);
+      } else {
+        
+        console.error('İstek gönderilirken hata oluştu:', error.message);
+      }
+      throw error; 
     }
   };
+  
 
   return { addresses, fetchAddresses, addAddress };
 };

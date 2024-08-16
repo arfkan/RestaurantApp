@@ -21,25 +21,25 @@ export default function MapScreen({ navigation }) {
     };
 
     const handleSaveLocation = async () => {
-        if (selectedLocation) {
-            console.log('Gönderilen veri:', selectedLocation);
-            try {
-                // Veritabanına kaydet
-                const response = await axios.post(`${BASE_URL}saveLocation`, selectedLocation);
-                console.log('Sunucu yanıtı:', response.data);
-
-                // Adreslerim.js'e kaydet
-                const address = `Lat: ${selectedLocation.latitude}, Lng: ${selectedLocation.longitude}`;
-                await addAddress(address, selectedLocation.latitude, selectedLocation.longitude);
-
-                // Adreslerim sayfasına yönlendir
-                navigation.navigate('Adreslerim');
-            } catch (error) {
-                console.error('Hata detayları:', error.response ? error.response.data : error.message);
-            }
+        try {
+          const newAddress = {
+            latitude: selectedLocation.latitude,
+            longitude: selectedLocation.longitude,
+          };
+          await addAddress(newAddress);
+          navigation.navigate('Adreslerim');
+        } catch (error) {
+          if (error.response) {
+            console.error('Sunucu yanıtı:', error.response.data);
+          } else if (error.request) {
+            console.error('İstek yapıldı ancak sunucudan yanıt alınamadı:', error.request);
+          } else {
+            console.error('Axios isteği sırasında bir hata oluştu:', error.message);
+          }
         }
-    };
-
+      };
+    
+      
     return (
         <View style={styles.container}>
             <MapView
