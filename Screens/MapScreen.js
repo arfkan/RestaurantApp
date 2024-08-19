@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { StyleSheet, View, Button, Platform } from 'react-native';
+import { StyleSheet, View, Button, Platform, Alert } from 'react-native';
 import axios from 'axios'; 
 import { useAddresses } from '../Hooks/useAddresses';
 
@@ -22,24 +22,42 @@ export default function MapScreen({ navigation }) {
 
     const handleSaveLocation = async () => {
         try {
-          const newAddress = {
-            latitude: selectedLocation.latitude,
-            longitude: selectedLocation.longitude,
-          };
-          await addAddress(newAddress);
-          navigation.navigate('Adreslerim');
+            const newAddress = {
+                latitude: selectedLocation.latitude,
+                longitude: selectedLocation.longitude,
+            };
+
+            await axios.post(`${BASE_URL}saveLocation`, newAddress); // Konumu backend'e gönderiyoruz
+            navigation.navigate('Adreslerim');
         } catch (error) {
-          if (error.response) {
-            console.error('Sunucu yanıtı:', error.response.data);
-          } else if (error.request) {
-            console.error('İstek yapıldı ancak sunucudan yanıt alınamadı:', error.request);
-          } else {
-            console.error('Axios isteği sırasında bir hata oluştu:', error.message);
-          }
+            if (error.response) {
+                console.error('Sunucu yanıtı:', error.response.data);
+            } else if (error.request) {
+                console.error('İstek yapıldı ancak sunucudan yanıt alınamadı:', error.request);
+            } else {
+                console.error('Axios isteği sırasında bir hata oluştu:', error.message);
+            }
         }
-      };
-    
-      
+    };
+
+    const confirmSaveLocation = () => {
+        Alert.alert(
+            'Konumu Kaydet',
+            'Seçtiğiniz konumu kaydetmek istiyor musunuz?',
+            [
+                {
+                    text: 'İptal',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Evet',
+                    onPress: handleSaveLocation,
+                },
+            ],
+            { cancelable: true }
+        );
+    };
+
     return (
         <View style={styles.container}>
             <MapView
@@ -54,10 +72,11 @@ export default function MapScreen({ navigation }) {
             >
                 <Marker coordinate={selectedLocation} />
             </MapView>
-            <Button title="Konumu Kaydet" onPress={handleSaveLocation} />
+            <Button title="Konumu Kaydet" onPress={confirmSaveLocation} />
         </View>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,

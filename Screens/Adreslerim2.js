@@ -104,6 +104,7 @@ export default function Adreslerim2({ navigation }) {
           data={addresses}
           renderItem={({ item }) => (
             <View style={styles.addressItem}>
+              <Icon name="home" size={24} color="red" />
               <Text style={styles.addressText}>{item.city}, {item.district}, {item.neighborhood}, {item.street}, {item.doorNumber}</Text>
               <TouchableOpacity onPress={() => handleRemoveAdres(item._id)}>
                 <Icon name="trash" size={24} color="red" />
@@ -118,37 +119,43 @@ export default function Adreslerim2({ navigation }) {
         <Text style={styles.headerText}>Yeni Adres Ekle</Text>
         
         <DropdownComponent
-          style={styles.dropDesign}
-          pickedValue={selectedCity}
-          onChange={handleSelectedCity}
-          items={cities}
-        />
-        <DropdownComponent
-          style={styles.dropDesign}
-          pickedValue={selectedDistrict}
-          onChange={handleSelectedDistrict}
-          items={districtsByCity}
-        />
-        <DropdownComponent
-          style={styles.dropDesign}
-          pickedValue={selectedNeighborhood}
-          onChange={setSelectedNeighborhood}
-          items={neighborhoodsByDistrict}
-        />
+    style={styles.dropDesign}
+    pickedValue={selectedCity}
+    onChange={handleSelectedCity}
+    items={cities}
+    placeholder="Şehir Seç"
+/>
+<DropdownComponent
+    style={styles.dropDesign}
+    pickedValue={selectedDistrict}
+    onChange={handleSelectedDistrict}
+    items={districtsByCity}
+    placeholder="İlçe Seç"
+/>
+<DropdownComponent
+    style={styles.dropDesign}
+    pickedValue={selectedNeighborhood}
+    onChange={setSelectedNeighborhood}
+    items={neighborhoodsByDistrict}
+    placeholder="Mahalle Seç"
+/>
 
-          {/*<TextInput
+
+      {/*
+       <TextInput
           style={styles.input}
-          placeholder="Sokak Seçin"
+          placeholder="Sokak ismini yazınız"
           value={street}
           onChangeText={setStreet}
         />
         <TextInput
           style={styles.input}
-          placeholder="Kapı Numarası Girin"
+          placeholder="Kapı Numarası Giriniz"
           value={doorNumber}
           onChangeText={setDoorNumber}
-        /> 
-          */}
+        />
+        */}    
+          
         <TouchableOpacity style={styles.addButton} onPress={handleAddAddressAndNavigate}>
           <Text style={styles.addButtonText}>Adres Ekle</Text>
         </TouchableOpacity>
@@ -163,104 +170,124 @@ export default function Adreslerim2({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f7f7f7',
-        padding: 20,
-    },
-    addressListContainer: {
-        flex: 3,
-        marginBottom: 25,
-    },
-    addAddressContainer: {
-        flex: 7,
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 15,
-        elevation: 5,
-        shadowColor: '#000', // Ekstra gölge efekti
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
-    headerText: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 15,
-        color: '#333',
-    },
-    input: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderColor: '#ddd',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        height: 50,
-        width: '100%', // Genişliği tam yaparak ekrandaki boşluğu kullanır
-        backgroundColor: '#fff',
-        shadowColor: '#000', // Ekstra gölge efekti
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-    },
-    addressItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#fff',
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 10,
-        elevation: 3,
-        shadowColor: '#000', // Ekstra gölge efekti
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-    },
-    addressText: {
-        flex: 1,
-        fontSize: 16,
-        color: '#333',
-    },
-    addButton: {
-        backgroundColor: '#007BFF',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    addButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    mapButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 5,
-        backgroundColor: '#FFD700',
-    },
-    mapButtonText: {
-        marginLeft: 10,
-        fontSize: 16,
-        color: '#333',
-    },
-    dropDesign: {
-        marginBottom: 22,
-        borderWidth: 1, // Kenar çizgisi
-        borderColor: '#ddd',
-        borderRadius: 10,
-        padding: 10,
-        backgroundColor: '#fff',
-        shadowColor: '#000', // Ekstra gölge efekti
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-    },
+  container: {
+      flex: 1,  
+      padding: 20,
+  },
+  addressListContainer: {
+      flex: 3,
+      marginBottom: 10,
+  },
+  addAddressContainer: {
+      flex: 7,
+      borderRadius: 15,
+      padding: 20,
+      elevation: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.3,
+      shadowRadius: 10,
+      borderColor: '#ff6b6b',
+      borderWidth: 1,
+  },
+  headerText: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      marginBottom: 15,
+      color: '#ff6b6b',
+      textTransform: 'uppercase',
+      letterSpacing: 2,
+      textAlign: 'center',
+  },
+  input: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: 'gray',
+    borderWidth: 3,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    height: 50,
+    marginBottom: 10,
+    
+ 
+  },
+  addressItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: '#1c1e24',
+      padding: 15,
+      borderRadius: 15,
+      marginBottom: 15,
+      elevation: 5,
+      shadowColor: '#ff6b6b',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.3,
+      shadowRadius: 5,
+      borderWidth: 1,
+      borderColor: '#ff6b6b',
+      marginRight: 10,
+  },
+  addressText: {
+      flex: 1,
+      fontSize: 18,
+      color: '#f1f1f1',
+      fontWeight: '500',
+      marginLeft: 10,
+  },
+  addButton: {
+      backgroundColor: '#ff6b6b',
+      paddingVertical: 15,
+      paddingHorizontal: 25,
+      borderRadius: 50,
+      alignItems: 'center',
+      marginBottom: 20,
+      elevation: 5,
+      shadowColor: '#ff6b6b',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 10,
+  },
+  addButtonText: {
+      color: '#fff',
+      fontSize: 18,
+      fontWeight: 'bold',
+      letterSpacing: 1.5,
+  },
+  mapButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 15,
+      paddingHorizontal: 25,
+      borderRadius: 50,
+      backgroundColor: '#f9c74f',
+      elevation: 5,
+      shadowColor: '#f9c74f',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 10,
+  },
+  mapButtonText: {
+      marginLeft: 10,
+      fontSize: 18,
+      color: '#fff',
+      fontWeight: 'bold',
+      letterSpacing: 1,
+  },
+  dropDesign: {
+      marginBottom: 25,
+      borderWidth: 1,
+      borderColor: '#ff6b6b',
+      borderRadius: 15,
+      padding: 15,
+      backgroundColor: '#2c2f38',
+      shadowColor: '#ff6b6b',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.5,
+      shadowRadius: 5,
+      color: '#fff',
+      fontSize: 16,
+  },
 });
 

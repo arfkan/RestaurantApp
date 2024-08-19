@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, Platform, ScrollView, ActivityIndicator, Animated } from 'react-native';
+import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, Platform, ScrollView, ActivityIndicator, Animated, Modal } from 'react-native';
 import axios from 'axios';
 import { AntDesign } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -29,19 +29,66 @@ export default function ResultsShowScreen({ route }) {
   const [counter, setCounter] = useState(0);
   const [animatedValue] = useState(new Animated.Value(0));
 
+  // yorumlar kısmı için 
+  const [isCommentPanelVisible, setIsCommentPanelVisible] = useState(false); // yorum panelinin görünürlüğünü kontrol etmek için
+  const [comments, setComments] = useState([]); // bu state yorumları tutmak için 
 
+ 
+    const CommentsPanel = ({ visible, onClose, comments }) => (
+      <Modal
+        transparent={true}
+        visible={visible}
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+            <FlatList
+              data={comments}
+              renderItem={({ item }) => (
+                <View style={styles.commentItem}>
+                  <Text>{item.text}</Text>
+                </View>
+              )}
+              keyExtractor={(item) => item.id.toString()}
+            />
+          </View>
+        </View>
+      </Modal>
+    );
 
-  const increaseQuantity = (product) => {
-    addToCart(product);
-    setCounter(prevCounter => prevCounter + 1);
-    animateIcon();
-  };
-
+    const handleShowComments = async () => {
+      try {
+          // API'den yorumları çek
+          const response = await axios.get(`${BASE_URL}/comments`);
   
- /* const navigateToSiparislerim = () => {
-    navigation.navigate('Siparislerim', { cartItems });
+          if (response.status !== 200) { 
+              throw new Error('Yorumları getirirken bir sorun oluştu');
+          }
+  
+          const commentsData = response.data;
+ 
+          setComments(commentsData);
+  
+      } catch (error) {
+          console.error('Yorumları getirirken hata oluştu:', error.message);
+
+          alert('Yorumları getirirken bir sorun oluştu. Lütfen tekrar deneyin.');
+
+          const sampleComments = [
+              { id: 1, text: "Harika bir restoran!" },
+              { id: 2, text: "Yemekler lezzetliydi." },
+              { id: 3, text: "Servis biraz yavaştı." },
+          ];
+          setComments(sampleComments);
+      } finally {
+          // Yorum panelini her durumda göster
+          setIsCommentPanelVisible(true);
+      }
   };
-  */
   
   const animateIcon = () => {
     animatedValue.setValue(0);
@@ -61,6 +108,7 @@ export default function ResultsShowScreen({ route }) {
     inputRange: [0, 1],
     outputRange: [0, 0],
   });
+
 
   useEffect(() => {
     navigation.setOptions({
@@ -172,6 +220,7 @@ export default function ResultsShowScreen({ route }) {
 
   const photos = [sonuc.image_url, ...(sonuc.photos || [])];
 
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -180,6 +229,7 @@ export default function ResultsShowScreen({ route }) {
           <AntDesign name={isFavorite ? "heart" : "hearto"} size={24} color="red" />
         </TouchableOpacity>
       </View>
+
       <View style={styles.infoContainer}>
         <View style={styles.infoRow}>
           <Icon name="phone" size={20} color="red" />
@@ -190,8 +240,12 @@ export default function ResultsShowScreen({ route }) {
           <Text style={styles.infoText}>Puan: {sonuc.rating}</Text>
         </View>
         <View style={styles.infoRow}>
-          <Icon name="comment" size={20} color="red" />
-          <Text style={styles.infoText}>Yorum Sayısı: {sonuc.review_count}</Text>
+         <Icon name="comment" size={20} color="red" />
+         <Text style={styles.infoText}>Yorum Sayısı: {sonuc.review_count}</Text>
+        <TouchableOpacity onPress={handleShowComments}>
+        <Text style={styles.comment}>Yorumları Gör</Text>
+        </TouchableOpacity>
+        <Icon name="comment" size={20} color="red" />
         </View>
         <View style={styles.infoRow}>
           <Icon name="location-on" size={20} color="red" />
@@ -202,11 +256,13 @@ export default function ResultsShowScreen({ route }) {
           <Text style={styles.infoText}>Menü: {sonuc.attributes.menu_url}</Text>
         </View>
       </View>
-      <ScrollView horizontal>
+
+      <ScrollView horizontal style={styles.photosContainer}>
         {photos.map((photo, index) => (
           <Image key={index} style={styles.image} source={{ uri: photo }} />
         ))}
       </ScrollView>
+
       <View style={styles.productList}>
         <Text style={styles.productListHeader}>Ürünler:</Text>
         <FlatList
@@ -222,7 +278,7 @@ export default function ResultsShowScreen({ route }) {
                       id: item._id,
                       name: item.name,
                       image: item.image,
-                      price: item.price
+                      price: item.price,
                     });
                   }}
                 >
@@ -242,6 +298,12 @@ export default function ResultsShowScreen({ route }) {
           )}
         />
       </View>
+       
+    <CommentsPanel
+      visible={isCommentPanelVisible}
+      onClose={() => setIsCommentPanelVisible(false)}
+      comments={comments}
+    />
     </ScrollView>
   );
 }
@@ -318,5 +380,36 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 14,
     color: '#888',
+  },
+  comment: {
+    marginLeft: 100,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '80%',
+  },
+  closeButton: {
+    alignSelf: 'flex-end',
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  commentItem: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingVertical: 10,
   },
 });

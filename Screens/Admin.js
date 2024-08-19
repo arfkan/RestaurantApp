@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Button, TextInput, Alert, FlatList, Image, Touc
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-const API_URL = 'http://192.168.95.112:5000/api/restaurants/';
+const API_URL = 'http://192.168.95.125:5000/api/restaurants/';
 
 export default function AdminScreen() {
   const [name, setName] = useState('');
@@ -218,4 +218,41 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  addressItem: {
+    flexDirection: 'row',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  addressInfo: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  addressName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  addressDetails: {
+    fontSize: 16,
+    color: '#777',
+    marginTop: 4,
+  },
+  editButton: {
+    backgroundColor: '#f0ad4e',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  editButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
+

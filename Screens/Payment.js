@@ -28,7 +28,7 @@ export default function Payment({ route }) {
   // ödeme işlemi 
   const calculateTotalPrice = ()=> {
 
-    return cartItems.reduce((total, item)=> total+ parseFloat(item.price), 0).toFixed(2);
+    return cartItems.reduce((total, item)=> total + (parseFloat(item.price)* (item.quantity || 1)), 0).toFixed(2); 
   };
 
   // çöp iconuma bastığımda ürünüm silinmesi için 
@@ -80,7 +80,8 @@ export default function Payment({ route }) {
             <Image source={{ uri: item.image }} style={styles.image} />
             <View style={styles.textContainer}>
               <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemPrice}>{item.price}</Text>
+              <Text style={styles.itemQuantity}>Adet: {item.quantity || 1}</Text>
+              <Text style={styles.itemPrice}>${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}</Text>
             </View>
           </View>
         )}
@@ -102,91 +103,105 @@ export default function Payment({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    padding: 20,
+   
   },
   button: {
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 10,
+    backgroundColor: '#ff6b6b',
+    padding: 15,
+    borderRadius: 50, 
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 20,
+    elevation: 5, 
+    shadowColor: '#ff6b6b',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   firstRectangle: {
-    padding: 25,
-    backgroundColor: '#ffefd5',
-    borderColor: '#ccc',
+    padding: 20,
+    backgroundColor: '#fff', 
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 15, 
     width: '100%',
     marginVertical: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    elevation: 2, 
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
   textContainer: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginLeft: 10,
+    marginLeft: 15,
   },
   writing: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#333', 
   },
   time: {
     fontSize: 14,
-    color: 'grey',
+    color: '#777', 
   },
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
+    padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#ddd',
     justifyContent: 'space-between',
   },
   image: {
-    width: 50,
-    height: 50,
-    borderRadius: 5,
-  },
-  textContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginLeft: 10,
+    width: 60,
+    height: 60,
+    borderRadius: 10, 
+    backgroundColor: '#f5f5f5', 
   },
   itemName: {
     fontSize: 16,
+    color: '#333', 
     flex: 1,
   },
   itemPrice: {
     fontSize: 16,
     textAlign: 'right',
+    color: '#ff6b6b', 
+    marginLeft: 10,
   },
   listContainer: {
     flexGrow: 1,
   },
-  secondeRectangle: {
-    padding: 25,
-    backgroundColor: '#ffefd5',
-    borderColor: '#ccc',
+  secondRectangle: {
+    padding: 20,
+    backgroundColor: '#fff', 
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 15, 
     width: '100%',
     marginVertical: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop:-100
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
   totalPriceText: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333', 
   },
 });
