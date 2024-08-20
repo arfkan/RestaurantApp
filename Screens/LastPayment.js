@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    
+    backgroundColor: '#fff', 
   },
   iconAndText: {
     flexDirection: 'row',
@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 5,
+    color: '#d32f2f', 
   },
   mapContainer: {
     height: 200,
@@ -105,6 +106,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     marginBottom: 20,
+    backgroundColor: '#fff', 
   },
   map: {
     ...StyleSheet.absoluteFillObject,
@@ -116,13 +118,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: '#ffefd5',
+    backgroundColor: '#ffebee', 
     marginBottom: 180,
   },
   paymentOptions: {
     padding: 20,
-    backgroundColor: '#ffefd5',
-    borderColor: '#ccc',
+    backgroundColor: '#ffebee', 
+    borderColor: '#d32f2f',
     borderWidth: 1,
     borderRadius: 10,
     width: '100%',
@@ -131,35 +133,36 @@ const styles = StyleSheet.create({
   paymentText: {
     fontSize: 16,
     marginBottom: 10,
-    fontWeight: '700'
+    fontWeight: '700',
+    color: '#d32f2f', 
   },
   dropdown: {
     width: '100%',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#d32f2f', 
     padding: 10,
     borderRadius: 5,
-    backgroundColor: '#fff',
+    backgroundColor: '#fff', 
   },
   dropdownText: {
     fontSize: 16,
-    fontWeight: '600'
+    fontWeight: '600',
+    color: '#d32f2f', 
   },
   dropdownDropdown: {
     width: '100%',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#d32f2f', 
     borderRadius: 5,
-    backgroundColor: '#fff',
-   
+    backgroundColor: '#fff', 
   },
   dropdownDropdownText: {
     fontSize: 16,
     padding: 10,
-     fontWeight: '800'
+    fontWeight: '800',
+    color: '#d32f2f',
   },
   dropdownDropdownTextHighlight: {
-    backgroundColor: 'red',
+    backgroundColor: '#ffcdd2', 
   },
 });
-

@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-   
+    backgroundColor: '#fff', 
   },
   button: {
     backgroundColor: '#ff6b6b',
@@ -120,14 +120,14 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: '#fff', 
     fontSize: 18,
     fontWeight: 'bold',
   },
   firstRectangle: {
     padding: 20,
-    backgroundColor: '#fff', 
-    borderColor: '#ddd',
+    backgroundColor: '#ffebee', 
+    borderColor: '#ff6b6b', 
     borderWidth: 1,
     borderRadius: 15, 
     width: '100%',
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     elevation: 2, 
-    shadowColor: '#000',
+    shadowColor: '#ff6b6b',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -149,11 +149,11 @@ const styles = StyleSheet.create({
   writing: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333', 
+    color: '#d32f2f', 
   },
   time: {
     fontSize: 14,
-    color: '#777', 
+    color: '#ff6b6b', 
   },
   itemContainer: {
     flexDirection: 'row',
@@ -167,11 +167,11 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 10, 
-    backgroundColor: '#f5f5f5', 
+    backgroundColor: '#f5f5f5',
   },
   itemName: {
     fontSize: 16,
-    color: '#333', 
+    color: '#d32f2f', 
     flex: 1,
   },
   itemPrice: {
@@ -185,8 +185,8 @@ const styles = StyleSheet.create({
   },
   secondRectangle: {
     padding: 20,
-    backgroundColor: '#fff', 
-    borderColor: '#ddd',
+    backgroundColor: '#ffebee', 
+    borderColor: '#ff6b6b', 
     borderWidth: 1,
     borderRadius: 15, 
     width: '100%',
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: '#ff6b6b',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -202,6 +202,6 @@ const styles = StyleSheet.create({
   totalPriceText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333', 
+    color: '#d32f2f', 
   },
 });

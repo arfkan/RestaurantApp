@@ -23,6 +23,9 @@ import Payment from './Screens/Payment';
 import LastPayment from './Screens/LastPayment';
 import CardInfoScreen from './Screens/CardInfoScreen';
 import Adreslerim2 from './Screens/Adreslerim2';
+import { UserProvider } from './context/UserContext';
+
+
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -49,7 +52,7 @@ function DrawerNavigator() {
   return (
     <Drawer.Navigator
       initialRouteName="Home"
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}  
       screenOptions={{
         headerStyle: { backgroundColor: 'crimson' },
         headerTintColor: 'white',
@@ -77,7 +80,6 @@ function DrawerNavigator() {
         })}
       />
       <Drawer.Screen name="Favori Restaurantlarım" component={FavoriRestaurantlarim} />
-      {/* <Drawer.Screen name="Adreslerim" component={Adreslerim} /> */}
       <Drawer.Screen name="Adreslerim" component={Adreslerim2} />
       <Drawer.Screen name="Admin Paneli" component={AdminScreen} />
       <Drawer.Screen name="Map" component={MapScreen} />
@@ -88,24 +90,26 @@ function DrawerNavigator() {
 
 export default function App() {
   return (
-    <FavoritesProvider>
-      <CartProvider>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Welcome">
-            <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />     
-            <Stack.Screen name="Payment" component={Payment} />
-            <Stack.Screen name="LastPayment" component={LastPayment} />
-            <Stack.Screen name="CardInfoScreen" component={CardInfoScreen} />
-            <Stack.Screen name="Siparislerim" component={Siparislerim} />
-            
-          </Stack.Navigator>
-          <StatusBar style="auto" />
-        </NavigationContainer>
-      </CartProvider>
-    </FavoritesProvider>
+    <UserProvider> 
+      <FavoritesProvider>
+        <CartProvider>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="Welcome">
+              <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="MainPage" component={DrawerNavigator} options={{ headerShown: false }} />     
+              <Stack.Screen name="Payment" component={Payment} />
+              <Stack.Screen name="LastPayment" component={LastPayment} />
+              <Stack.Screen name="CardInfoScreen" component={CardInfoScreen} />
+              <Stack.Screen name="Siparislerim" component={Siparislerim} />
+              <Stack.Screen name="SearchScreen" component={SearchScreen}/>
+            </Stack.Navigator>
+            <StatusBar style="auto" />
+          </NavigationContainer>
+        </CartProvider>
+      </FavoritesProvider>
+    </UserProvider>
   );
 }
 
@@ -118,14 +122,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 20,
     height: 20,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   counterText: {
     color: 'white',
     fontSize: 12,
-    fontWeight: 'bold',
   },
 });
-
- 

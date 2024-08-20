@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TextInput, Dimensions, TouchableOpacity, ImageB
 import React, { useState, useEffect } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { firebase } from '../firebase';
+import { useUser } from '../context/UserContext';  // UserContext'i kullanarak user bilgilerini set edebilmek için
 
 const { width, height } = Dimensions.get('window');
 
@@ -10,6 +11,9 @@ export default function SignupScreen({ navigation }) {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordsMatch, setPasswordsMatch] = useState(true);
+    const [userName, setUserName] = useState(true);
+
+    const { setUser } = useUser(); // UserContext'ten setUser fonksiyonunu al
 
     useEffect(() => {
         if (password && confirmPassword) {
@@ -29,7 +33,15 @@ export default function SignupScreen({ navigation }) {
 
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
-                // Signup successful
+                // Kullanıcı başarılı şekilde kayıt oldu
+                const user = userCredential.user;
+
+                // UserContext'teki user bilgisini güncelle
+                setUser({
+                    email: user.email,
+                    uid: user.uid,
+                });
+
                 navigation.navigate('Auth');
             })
             .catch((error) => {
@@ -43,6 +55,12 @@ export default function SignupScreen({ navigation }) {
             <View style={styles.container}>
                 <View style={styles.rectangle}>
                     <AntDesign name="addusergroup" size={50} color="black" style={styles.icon} />
+                    <TextInput 
+                        style={styles.input} 
+                        placeholder='Kullanıcı adı oluştur' 
+                        value={userName} 
+                        onChangeText={setUserName} 
+                    />
                     <TextInput 
                         style={styles.input} 
                         placeholder='E-posta' 

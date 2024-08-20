@@ -35,7 +35,6 @@ export default function ProductResult({ route }) {
       note,
     };
 
-    // Navigate back to Siparislerim with updated product details
     navigation.navigate('Siparislerim', { updatedCartItem: productDetails });
   };
   
@@ -63,7 +62,7 @@ export default function ProductResult({ route }) {
           </View>
         </View>
 
-        {/* Sauce Selection */}
+  
         <View style={[styles.rectangle, styles.sosRectangle]}>
           <Text style={styles.choice}>Sos Tercihleri</Text>
           <Text style={styles.alttitle}>Birini seç</Text>
@@ -77,7 +76,6 @@ export default function ProductResult({ route }) {
           </View>
         </View>
 
-        {/* Drink Selection */}
         <View style={[styles.rectangle, styles.sosRectangle]}>
           <Text style={styles.choice}>İçecek Seçenekleri</Text>
           <Text style={styles.alttitle}>Birini seç</Text>
@@ -91,7 +89,6 @@ export default function ProductResult({ route }) {
           </View>
         </View>
 
-        {/* Product Note */}
         <View style={styles.productRectangle}>
           <View>
             <Text style={styles.note}>Ürün Notu</Text>
@@ -110,7 +107,6 @@ export default function ProductResult({ route }) {
         </View>
       </ScrollView>
 
-      {/* Quantity and Add to Cart Button */}
       <View style={styles.fixedRectangle}>
         <TouchableOpacity onPress={decreaseQuantity}>
           <Icon name="remove" size={25} color="red" />
@@ -132,7 +128,7 @@ export default function ProductResult({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f2f2f2', 
     padding: 20,
   },
   scrollViewContainer: {
@@ -142,32 +138,36 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 250,
-    borderRadius: 10,
+    borderRadius: 15, 
     marginBottom: 20,
+    backgroundColor: '#e0e0e0',
   },
   name: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
+    color: '#333', 
   },
   price: {
     fontSize: 20,
-    color: 'green',
+    color: '#28a745', 
     textAlign: 'center',
     marginBottom: 20,
+    fontWeight: '700', 
   },
   explain: {
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 25,
+    color: '#555', 
   },
   rectangle: {
     padding: 15,
     backgroundColor: '#ffefd5',
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 15, 
     width: '100%',
     marginBottom: 20,
   },
@@ -177,17 +177,19 @@ const styles = StyleSheet.create({
   choice: {
     fontSize: 16,
     fontWeight: '700',
-    color: 'red',
+    color: '#dc3545', 
     marginBottom: 8,
   },
   alttitle: {
     fontSize: 14,
     marginBottom: 12,
     marginVertical: 5,
+    color: '#666', 
   },
   alttitle2: {
     fontSize: 14,
     marginBottom: 10,
+    color: '#666', 
   },
   options: {
     flexDirection: 'row',
@@ -206,21 +208,21 @@ const styles = StyleSheet.create({
   optionText: {
     marginLeft: 10,
     fontSize: 16,
-    color: 'black',
+    color: '#333', 
   },
   productRectangle: {
     padding: 15,
     backgroundColor: '#fff7e6',
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 15, 
     width: '100%',
     marginBottom: 20,
   },
   note: {
     fontSize: 16,
     fontWeight: '700',
-    color: 'red',
+    color: '#dc3545', 
     marginBottom: 8,
   },
   input: {
@@ -237,27 +239,34 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'white',
+    backgroundColor: '#fff', 
     padding: 15,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5, 
   },
   fixedText: {
     fontSize: 20,
     fontWeight: 'bold',
     marginHorizontal: 10,
+    color: '#333', 
   },
   button: {
-    backgroundColor: 'blue',
+    backgroundColor: '#007bff', 
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 10,
   },
   buttonText: {
-    color: 'white',
+    color: '#fff', 
     fontSize: 16,
+    fontWeight: '600',
   },
 });

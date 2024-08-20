@@ -4,8 +4,10 @@ import SearchBar from '../components/SearchBar';
 import useResults from '../Hooks/useResults';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import SpeedDial from '../components/SpeedDial';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useCart } from '../context/CartContext'; // Sepet bağlamını içe aktar
 
-const API_URL = 'http://192.168.95.125:5000/api/restaurants/'; // burda uygulama ilk açıldığında  veriler gelmedi pc ıpv4 adresini almak ve yazmak lazım.
+const API_URL = 'http://192.168.95.125:5000/api/restaurants/';
 
 export default function SearchScreen() {
   const [fetchData, results, errorMessage] = useResults();
@@ -17,6 +19,9 @@ export default function SearchScreen() {
   const navigation = useNavigation();
   const listAnimation = useRef(new Animated.Value(0)).current;
   const titleAnimation = useRef(new Animated.Value(0)).current;
+  const { cartItems } = useCart(); // Sepet öğelerini bağlamdan al
+
+  
 
   const speedDialActions = [
     { icon: 'attach-money', name: "Ucuz Restaurantlar", onPress: () => handleFilter('₺') },
@@ -128,15 +133,34 @@ export default function SearchScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.openDrawer()}
+          style={styles.menuButton}
+        >
+          <Icon name="menu" size={24} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Siparislerim')}
+          style={styles.cartButton}
+        >
+          <Icon name="shopping-cart" size={24} color="black" />
+          {cartItems.length > 0 && (
+            <View style={styles.counterContainer}>
+              <Text style={styles.counterText}>{cartItems.length}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
+
       <SearchBar
         term={term}
         onTermChange={setTerm}
         onTermSubmit={handleSearch}
       />
-        <Animated.View style={[styles.titleContainer, { opacity: titleAnimation, transform: [{ translateX: titleTranslateX }] }]}>
-          <Text style={styles.title}>Aradığın Restaurantlar burada!</Text>
-        </Animated.View>
-
+      <Animated.View style={[styles.titleContainer, { opacity: titleAnimation, transform: [{ translateX: titleTranslateX }] }]}>
+        <Text style={styles.title}>Aradığın Restaurantlar burada!</Text>
+      </Animated.View>
 
       <View style={styles.speedDialContainer}>
         <SpeedDial 
@@ -162,7 +186,6 @@ export default function SearchScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -215,5 +238,36 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'black',
     fontWeight: 25,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    backgroundColor: 'white',
+    elevation: 3, // Android için gölge
+  },
+  menuButton: {
+    marginLeft: 10,
+  },
+  cartButton: {
+    marginRight: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  counterContainer: {
+    position: 'absolute',
+    top: -10,
+    right: -10,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  counterText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });

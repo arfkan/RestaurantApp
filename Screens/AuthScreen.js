@@ -39,7 +39,7 @@ export default function AuthScreen({ navigation }) {
 
         firebase.auth().signInWithEmailAndPassword(email, password)
             .then((userCredential) => {
-                navigation.navigate('Main');
+                navigation.navigate('MainPage');
             })
             .catch((error) => {
                 console.error(error);

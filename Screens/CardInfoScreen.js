@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import LottieView from 'lottie-react-native';
+import { useNavigation } from '@react-navigation/native'; // Yönlendirme için
+import { useCart } from '../context/CartContext';
 
 export default function CardInfoScreen() {
   const [cardHolderName, setCardHolderName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
-
   const [showAnimation, setShowAnimation] = useState(false);
 
-  // Kart numarasını 4-4-4-4 formatında biçimlendirmek için 
+  const navigation = useNavigation();
+  const {clearCart} = useCart(); // ödeme işleminden sonra clear ile sepet sıfırlanmakta.
+
   const formatCardNumber = (number) => {
     return number
       .replace(/\s+/g, '') 
-      .replace(/(\d{4})(?=\d)/g, '$1 '); // Her 4 rakamdan sonra bir boşluk ekliyoruz.
+      .replace(/(\d{4})(?=\d)/g, '$1 ');
   };
 
   const validateCardNumber = (number) => {
@@ -22,7 +25,6 @@ export default function CardInfoScreen() {
     return re.test(number);
   };
 
-  // Kart numarasını kontrol eder ve doğrular
   const handleCardNumber = () => {
     const formattedCardNumber = formatCardNumber(cardNumber);
 
@@ -35,31 +37,25 @@ export default function CardInfoScreen() {
       return;
     }
 
-    //Alert.alert('Başarılı!', 'Alışveriş başarılı bir şekilde gerçekleşti.', [{ text: 'Tamam' }]);
-
-    // Animasyon 
     setShowAnimation(true);
+
     setTimeout(() => {
       setShowAnimation(false);
-    }, 3000);
-    
-    
+      clearCart();
+      navigation.navigate('SearchScreen'); // SearchScreen'e yönlendirme
+      // navigation.navigate('App'); // App.js yönlendirmesi genellikle gerekmez, ancak eğer gerekiyorsa yukarıdaki kodu kullanabilirsiniz.
+    }, 3000); // 3000ms animasyon süresi
   };
 
-   // Ay/Yıl formatını otomatik olarak düzenleyen fonksiyon
-   const formatExpiryDate = (text) => {
-    // Sayı olmayan karakterleri kaldır
+  const formatExpiryDate = (text) => {
     const cleaned = text.replace(/[^0-9]/g, '');
-    
     let formatted = cleaned;
     if (cleaned.length > 2) {
       formatted = cleaned.slice(0, 2) + '/' + cleaned.slice(2, 4);
     }
-    
     return formatted;
   };
 
- 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Kart Bilgileri</Text>
@@ -79,7 +75,7 @@ export default function CardInfoScreen() {
         onChangeText={(text) => setCardNumber(formatCardNumber(text))}
         keyboardType="numeric"
         placeholderTextColor="#888"
-        maxLength={19} // Formatlı kart numarası için maxLength
+        maxLength={19}
       />
       
       <View style={styles.rowContainer}>
@@ -90,7 +86,7 @@ export default function CardInfoScreen() {
           onChangeText={(text) => setExpiryDate(formatExpiryDate(text))}
           keyboardType="numeric"
           placeholderTextColor="#888"
-          maxLength={5} // Ay/Yıl formatında giriş için
+          maxLength={5}
         />
         <TextInput
           style={styles.inputHalf}
@@ -99,8 +95,7 @@ export default function CardInfoScreen() {
           onChangeText={setCvv}
           keyboardType="numeric"
           placeholderTextColor="#888"
-          // secureTextEntry
-          maxLength={3} // CVV numarasının 3 karakterle sınırlı olması için
+          maxLength={3}
         />
       </View>
 
@@ -122,6 +117,7 @@ export default function CardInfoScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

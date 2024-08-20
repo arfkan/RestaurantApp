@@ -12,7 +12,7 @@ const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
   : 'http://localhost:5000/api/';
 
-export default function ResultsShowScreen({ route }) {
+  export default function ResultsShowScreen({ route }) {
   const [sonuc, setSonuc] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const { cartItems, addToCart } = useCart();
@@ -21,75 +21,53 @@ export default function ResultsShowScreen({ route }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const navigation = useNavigation();
-
-
   const [quantity, setQuantity] = useState(1);
-  const [counter, setCounter] = useState(0);
   const [animatedValue] = useState(new Animated.Value(0));
+  const [isCommentPanelVisible, setIsCommentPanelVisible] = useState(false);
+  const [comments, setComments] = useState([]);
 
-  // yorumlar kısmı için 
-  const [isCommentPanelVisible, setIsCommentPanelVisible] = useState(false); // yorum panelinin görünürlüğünü kontrol etmek için
-  const [comments, setComments] = useState([]); // bu state yorumları tutmak için 
-
- 
-    const CommentsPanel = ({ visible, onClose, comments }) => (
-      <Modal
-        transparent={true}
-        visible={visible}
-        animationType="slide"
-        onRequestClose={onClose}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>X</Text>
-            </TouchableOpacity>
-            <FlatList
-              data={comments}
-              renderItem={({ item }) => (
-                <View style={styles.commentItem}>
-                  <Text>{item.text}</Text>
-                </View>
-              )}
-              keyExtractor={(item) => item.id.toString()}
-            />
-          </View>
+  const CommentsPanel = ({ visible, onClose, comments }) => (
+    <Modal
+      transparent={true}
+      visible={visible}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>X</Text>
+          </TouchableOpacity>
+          <FlatList
+            data={comments}
+            renderItem={({ item }) => (
+              <View style={styles.commentItem}>
+                <Text>{item.text}</Text>
+              </View>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+          />
         </View>
-      </Modal>
-    );
+      </View>
+    </Modal>
+  );
 
-    const handleShowComments = async () => {
-      try {
-          // API'den yorumları çek
-          const response = await axios.get(`${BASE_URL}/comments`);
-  
-          if (response.status !== 200) { 
-              throw new Error('Yorumları getirirken bir sorun oluştu');
-          }
-  
-          const commentsData = response.data;
- 
-          setComments(commentsData);
-  
-      } catch (error) {
-          console.error('Yorumları getirirken hata oluştu:', error.message);
-
-          alert('Yorumları getirirken bir sorun oluştu. Lütfen tekrar deneyin.');
-
-          const sampleComments = [
-              { id: 1, text: "Harika bir restoran!" },
-              { id: 2, text: "Yemekler lezzetliydi." },
-              { id: 3, text: "Servis biraz yavaştı." },
-          ];
-          setComments(sampleComments);
-      } finally {
-          // Yorum panelini her durumda göster
-          setIsCommentPanelVisible(true);
+  const handleShowComments = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/comments`);
+      if (response.status !== 200) {
+        throw new Error('Yorumları getirirken bir sorun oluştu');
       }
+      setComments(response.data);
+    } catch (error) {
+      console.error('Yorumları getirirken hata oluştu:', error.message);
+      alert('Yorumları getirirken bir sorun oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      setIsCommentPanelVisible(true);
+    }
   };
-  
+
   const animateIcon = () => {
     animatedValue.setValue(0);
     Animated.spring(animatedValue, {
@@ -108,7 +86,6 @@ export default function ResultsShowScreen({ route }) {
     inputRange: [0, 1],
     outputRange: [0, 0],
   });
-
 
   useEffect(() => {
     navigation.setOptions({
@@ -155,11 +132,7 @@ export default function ResultsShowScreen({ route }) {
       setSonuc(response.data);
     } catch (error) {
       console.error('Hata:', error);
-      if (error.response) {
-        setError('API Hatası');
-      } else {
-        setError('Ağ Hatası');
-      }
+      setError(error.response ? 'API Hatası' : 'Ağ Hatası');
     }
   };
 
@@ -220,17 +193,24 @@ export default function ResultsShowScreen({ route }) {
 
   const photos = [sonuc.image_url, ...(sonuc.photos || [])];
 
-
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>{sonuc.name}</Text>
-        <TouchableOpacity onPress={toggleFavorite}>
-          <AntDesign name={isFavorite ? "heart" : "hearto"} size={24} color="red" />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.infoContainer}>
+    <>
+      <FlatList
+        data={products}
+        keyExtractor={(item) => item._id}
+        numColumns={2}
+        ListHeaderComponent={
+          <View>
+            <View style={styles.headerContainer}>
+              <Text style={styles.headerText}>{sonuc.name}</Text>
+              <View style={styles.heart}>
+              <TouchableOpacity onPress={toggleFavorite}>
+                <AntDesign name={isFavorite ? "heart" : "hearto"} size={27} color="red"  />
+              </TouchableOpacity>
+              </View>
+              
+            </View>
+            <View style={styles.infoContainer}>
         <View style={styles.infoRow}>
           <Icon name="phone" size={20} color="red" />
           <Text style={styles.infoText}>Telefon: {sonuc.phone}</Text>
@@ -240,12 +220,12 @@ export default function ResultsShowScreen({ route }) {
           <Text style={styles.infoText}>Puan: {sonuc.rating}</Text>
         </View>
         <View style={styles.infoRow}>
-         <Icon name="comment" size={20} color="red" />
-         <Text style={styles.infoText}>Yorum Sayısı: {sonuc.review_count}</Text>
-        <TouchableOpacity onPress={handleShowComments}>
-        <Text style={styles.comment}>Yorumları Gör</Text>
-        </TouchableOpacity>
-        <Icon name="comment" size={20} color="red" />
+          <Icon name="comment" size={20} color="red" />
+          <Text style={styles.infoText}>Yorum Sayısı: {sonuc.review_count}</Text>
+          <TouchableOpacity onPress={handleShowComments}>
+            <Text style={styles.comment}>Yorumları Gör</Text>
+          </TouchableOpacity>
+          <Icon name="comment" size={20} color="red" />
         </View>
         <View style={styles.infoRow}>
           <Icon name="location-on" size={20} color="red" />
@@ -253,60 +233,54 @@ export default function ResultsShowScreen({ route }) {
         </View>
         <View style={styles.infoRow}>
           <Icon name="menu" size={20} color="red" />
-          <Text style={styles.infoText}>Menü: {sonuc.attributes.menu_url}</Text>
+          <Text style={styles.infoText}>Menü:</Text>
         </View>
       </View>
-
-      <ScrollView horizontal style={styles.photosContainer}>
-        {photos.map((photo, index) => (
-          <Image key={index} style={styles.image} source={{ uri: photo }} />
-        ))}
-      </ScrollView>
-
-      <View style={styles.productList}>
-        <Text style={styles.productListHeader}>Ürünler:</Text>
-        <FlatList
-          data={products}
-          keyExtractor={(item) => item._id}
-          numColumns={2}
-          renderItem={({ item }) => (
-            <View style={styles.productItem}>
-              <View style={styles.imageContainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate('ProductResult', {
-                      id: item._id,
-                      name: item.name,
-                      image: item.image,
-                      price: item.price,
-                    });
-                  }}
-                >
-                  <Image source={{ uri: item.image }} style={styles.productImage} />
-                </TouchableOpacity>
-                <Icon
-                  name="add"
-                  size={30}
-                  color="red"
-                  style={styles.icon}
-                  onPress={() => increaseQuantity(item)}
-                />
-              </View>
-              <Text style={styles.productName}>{item.name}</Text>
-              <Text style={styles.productPrice}>${item.price}</Text>
+            <ScrollView horizontal style={styles.photosContainer}>
+              {photos.map((photo, index) => (
+                <Image key={index} style={styles.image} source={{ uri: photo }} />
+              ))}
+            </ScrollView>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.productItem}>
+            <View style={styles.imageContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('ProductResult', {
+                    id: item._id,
+                    name: item.name,
+                    image: item.image,
+                    price: item.price,
+                  });
+                }}
+              >
+                <Image source={{ uri: item.image }} style={styles.productImage} />
+              </TouchableOpacity>
+              <Icon
+                name="add"
+                size={30}
+                color="red"
+                style={styles.icon}
+                onPress={() => addToCart(item)}
+              />
             </View>
-          )}
-        />
-      </View>
-       
-    <CommentsPanel
-      visible={isCommentPanelVisible}
-      onClose={() => setIsCommentPanelVisible(false)}
-      comments={comments}
-    />
-    </ScrollView>
+            <Text style={styles.productName}>{item.name}</Text>
+            <Text style={styles.productPrice}>${item.price}</Text>
+          </View>
+        )}
+      />
+
+      <CommentsPanel
+        visible={isCommentPanelVisible}
+        onClose={() => setIsCommentPanelVisible(false)}
+        comments={comments}
+      />
+    </>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -331,8 +305,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   infoText: {
-    marginLeft: 10,
-    fontSize: 16,
+    marginLeft: 5,
+    fontSize: 15,
     color: '#333', 
     fontWeight: '600', 
     lineHeight: 24, 
@@ -412,4 +386,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     paddingVertical: 10,
   },
+  heart: {
+    marginRight: 10,
+  }
 });
