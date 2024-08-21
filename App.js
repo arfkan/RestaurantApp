@@ -25,8 +25,6 @@ import CardInfoScreen from './Screens/CardInfoScreen';
 import Adreslerim2 from './Screens/Adreslerim2';
 import { UserProvider } from './context/UserContext';
 
-
-
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -36,12 +34,25 @@ function MainStackNavigator() {
       <Stack.Screen 
         name="Search" 
         component={SearchScreen} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="ResultsShow" 
+        component={ResultsShowScreen}  
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="ResultsShow" component={ResultsShowScreen} />
-      <Stack.Screen name="ProductResult" component={ProductResult} />
-      <Stack.Screen name="Siparislerim" component={Siparislerim} />
-      <Stack.Screen name="ResultsShowScreen" component={ResultsShowScreen} />
+      <Stack.Screen 
+        name="ProductResult" 
+        component={ProductResult} 
+      />
+      <Stack.Screen 
+        name="Siparislerim" 
+        component={Siparislerim} 
+      />
+      <Stack.Screen 
+        name="ResultsShowScreen" 
+        component={ResultsShowScreen} 
+      />
     </Stack.Navigator>
   );
 }
@@ -60,7 +71,7 @@ function DrawerNavigator() {
     >
       <Drawer.Screen 
         name="Home" 
-        component={MainStackNavigator} 
+        component={MainStackNavigator}  // Reference the MainStackNavigator here
         options={({ navigation }) => ({
           headerRight: () => (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
@@ -118,7 +129,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -10,
     right: -10,
-    backgroundColor: 'red',
+    backgroundColor: 'white',
     borderRadius: 10,
     width: 20,
     height: 20,
@@ -126,7 +137,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   counterText: {
-    color: 'white',
-    fontSize: 12,
+    color: 'black',
+    fontSize: 14,
   },
 });

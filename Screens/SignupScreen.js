@@ -11,7 +11,7 @@ export default function SignupScreen({ navigation }) {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordsMatch, setPasswordsMatch] = useState(true);
-    const [userName, setUserName] = useState(true);
+    const [userName, setUserName] = useState('');
 
     const { setUser } = useUser(); // UserContext'ten setUser fonksiyonunu al
 
@@ -40,6 +40,7 @@ export default function SignupScreen({ navigation }) {
                 setUser({
                     email: user.email,
                     uid: user.uid,
+                    userName: userName
                 });
 
                 navigation.navigate('Auth');

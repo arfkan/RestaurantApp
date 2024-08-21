@@ -15,12 +15,9 @@ function CustomDrawerContent(props) {
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.profileSection}>
-        <Image
-          source={require('../assets/images/ben.jpg')}
-          style={styles.profilePic}
-        />
+      <Icon name="user" size={50} color="red" />
         <View style={styles.profileInfo}>
-          <Text style={styles.UserName}>{user ? user.userName : 'Kullanıcı Adı'}</Text>
+          <Text style={styles.userName}>{user ? user.userName : 'Kullanıcı Adı'}</Text>
           <Text style={styles.userEmail}>{user ? user.email : 'E-posta' }</Text>
          
         </View>
@@ -72,22 +69,21 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
-  profilePic: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginRight: 16,
-  },
+ 
   profileInfo: {
     flex: 1,
   },
   userName: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    color: '#666',
+    fontWeight: '800',
+    marginLeft: 20
   },
   userEmail: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#666',
+    fontWeight: '800',
+    marginLeft: 20
   },
   navItem: {
     flexDirection: 'row',

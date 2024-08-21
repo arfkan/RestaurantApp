@@ -21,7 +21,8 @@ export default function SearchScreen() {
   const titleAnimation = useRef(new Animated.Value(0)).current;
   const { cartItems } = useCart(); // Sepet öğelerini bağlamdan al
 
-  
+
+
 
   const speedDialActions = [
     { icon: 'attach-money', name: "Ucuz Restaurantlar", onPress: () => handleFilter('₺') },
@@ -135,13 +136,13 @@ export default function SearchScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => navigation.openDrawer()}
+          onPress={() => navigation.openDrawer()} // Opens the drawer when the menu button is pressed
           style={styles.menuButton}
         >
           <Icon name="menu" size={24} color="black" />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Siparislerim')}
+          onPress={() => navigation.navigate('Siparislerim')} // Navigates to Siparislerim screen
           style={styles.cartButton}
         >
           <Icon name="shopping-cart" size={24} color="black" />
@@ -186,6 +187,7 @@ export default function SearchScreen() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

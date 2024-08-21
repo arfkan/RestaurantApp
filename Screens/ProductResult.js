@@ -1,10 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, ScrollView, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 
+
+const getProductType = (name) => {
+  const lowerCaseName = name.toLowerCase();
+  if (lowerCaseName.includes('kebap')) {
+    return 'kebap';
+  } else if (lowerCaseName.includes('döner')) {
+    return 'döner';
+  } else if (lowerCaseName.includes('baklava')) {
+    return 'baklava';
+  } else {
+    return 'other';
+  }
+};
+
+
 export default function ProductResult({ route }) {
-  const { id, name, image, price } = route.params;
+  const { id, name, image, price, product_explain, type = 'other' } = route.params; // burda kebap ve döner için bir type belirlenmesi için type a other dedik
+// product_explain ürün açıklamalarını veri tabanından getirmekte
+  const productType = getProductType(name);
 
   const [selectedOnion, setSelectedOnion] = useState(null);
   const [selectedSauce, setSelectedSauce] = useState(null);
@@ -22,12 +39,17 @@ export default function ProductResult({ route }) {
     setQuantity(prevQuantity => prevQuantity > 1 ? prevQuantity - 1 : 1);
   };
 
+  useEffect(() => {
+    console.log('Type:', type);
+  }, [type]);
+
   const addToCart = () => {
     const productDetails = {
       id,
       name,
       image,
       price,
+      product_explain,
       quantity,
       selectedOnion,
       selectedSauce,
@@ -37,57 +59,66 @@ export default function ProductResult({ route }) {
 
     navigation.navigate('Siparislerim', { updatedCartItem: productDetails });
   };
-  
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <Image source={{ uri: image }} style={styles.image} />
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.price}>${price}</Text>
-        <Text style={styles.explain}>1 Adet Beef Burger + Patates kızartması(Orta) + Çıtır Soğan(5'li) + 1 adet Cola (1L)</Text>
+        <Text style={styles.product_explain}>{product_explain}</Text> 
 
-        {/* Onion Selection */}
-        <View style={styles.rectangle}>
-          <Text style={styles.choice}>Soğanlı/ Soğansız</Text>
-          <Text style={styles.alttitle}>Birini seç</Text>
-          <View style={styles.options}>
-            <TouchableOpacity onPress={() => setSelectedOnion('Soğanlı')} style={styles.optionButton}>
-              <Icon name={selectedOnion === 'Soğanlı' ? "check-circle" : "circle"} size={20} color={selectedOnion === 'Soğanlı' ? 'green' : 'gray'}/>
-              <Text style={styles.optionText}>Soğanlı</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setSelectedOnion('Soğansız')} style={styles.optionButton}>
-              <Icon name={selectedOnion === 'Soğansız' ? "check-circle" : "circle"} size={20} color={selectedOnion === 'Soğansız' ? 'green' : 'gray'}/>
-              <Text style={styles.optionText}>Soğansız</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        {productType !== 'baklava' && (
+          <>
+            {(productType === 'kebap' || productType === 'döner') && (
+              <>
+                {/* Soğan Seçenekleri */}
+                <View style={styles.rectangle}>
+                  <Text style={styles.choice}>Soğanlı/ Soğansız</Text>
+                  <Text style={styles.alttitle}>Birini seç</Text>
+                  <View style={styles.options}>
+                    <TouchableOpacity onPress={() => setSelectedOnion('Soğanlı')} style={styles.optionButton}>
+                      <Icon name={selectedOnion === 'Soğanlı' ? "check-circle" : "circle"} size={20} color={selectedOnion === 'Soğanlı' ? 'green' : 'gray'} />
+                      <Text style={styles.optionText}>Soğanlı</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setSelectedOnion('Soğansız')} style={styles.optionButton}>
+                      <Icon name={selectedOnion === 'Soğansız' ? "check-circle" : "circle"} size={20} color={selectedOnion === 'Soğansız' ? 'green' : 'gray'} />
+                      <Text style={styles.optionText}>Soğansız</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
 
-  
-        <View style={[styles.rectangle, styles.sosRectangle]}>
-          <Text style={styles.choice}>Sos Tercihleri</Text>
-          <Text style={styles.alttitle}>Birini seç</Text>
-          <View style={styles.optionsColumn}>
-            {['Sos 1', 'Sos 2', 'Sos 3', 'Sos 4'].map(option => (
-              <TouchableOpacity key={option} onPress={() => setSelectedSauce(option)} style={styles.optionButton}>
-                <Icon name={selectedSauce === option ? "check-circle" : "circle"} size={20} color={selectedSauce === option ? 'green' : 'gray'}/>
-                <Text style={styles.optionText}>{option}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+                {/* Sos Tercihleri */}
+                <View style={[styles.rectangle, styles.sosRectangle]}>
+                  <Text style={styles.choice}>Sos Tercihleri</Text>
+                  <Text style={styles.alttitle}>Birini seç</Text>
+                  <View style={styles.optionsColumn}>
+                    {['Sos 1', 'Sos 2', 'Sos 3', 'Sos 4'].map(option => (
+                      <TouchableOpacity key={option} onPress={() => setSelectedSauce(option)} style={styles.optionButton}>
+                        <Icon name={selectedSauce === option ? "check-circle" : "circle"} size={20} color={selectedSauce === option ? 'green' : 'gray'} />
+                        <Text style={styles.optionText}>{option}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              </>
+            )}
 
-        <View style={[styles.rectangle, styles.sosRectangle]}>
-          <Text style={styles.choice}>İçecek Seçenekleri</Text>
-          <Text style={styles.alttitle}>Birini seç</Text>
-          <View style={styles.optionsColumn}>
-            {['Coco-cola(1L)', 'Coco-cola Light(1L)', 'Coco-cola Şekersiz(1L)', 'Sprite (1L)', 'Fanta (1L)'].map(option => (
-              <TouchableOpacity key={option} onPress={() => setSelectedDrink(option)} style={styles.optionButton}>
-                <Icon name={selectedDrink === option ? "check-circle" : "circle"} size={20} color={selectedDrink === option ? 'green' : 'gray'}/>
-                <Text style={styles.optionText}>{option}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+            {/* İçecek Seçenekleri */}
+            <View style={[styles.rectangle, styles.sosRectangle]}>
+              <Text style={styles.choice}>İçecek Seçenekleri</Text>
+              <Text style={styles.alttitle}>Birini seç</Text>
+              <View style={styles.optionsColumn}>
+                {['Coco-cola(1L)', 'Coco-cola Light(1L)', 'Coco-cola Şekersiz(1L)', 'Sprite (1L)', 'Fanta (1L)'].map(option => (
+                  <TouchableOpacity key={option} onPress={() => setSelectedDrink(option)} style={styles.optionButton}>
+                    <Icon name={selectedDrink === option ? "check-circle" : "circle"} size={20} color={selectedDrink === option ? 'green' : 'gray'} />
+                    <Text style={styles.optionText}>{option}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </>
+        )}
 
         <View style={styles.productRectangle}>
           <View>
@@ -113,7 +144,7 @@ export default function ProductResult({ route }) {
         </TouchableOpacity>
         <Text style={styles.fixedText}>{quantity}</Text>
         <TouchableOpacity onPress={increaseQuantity}>
-          <Icon name="add" size={25} color="red"/>
+          <Icon name="add" size={25} color="red" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={addToCart}>
@@ -156,11 +187,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: '700', 
   },
-  explain: {
+  product_explain: {
     fontSize: 16,
+    color: 'black',
+    marginVertical:10,
+    textAlign: 'center',
     fontWeight: '700',
-    marginBottom: 25,
-    color: '#555', 
   },
   rectangle: {
     padding: 15,

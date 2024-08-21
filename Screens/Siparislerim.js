@@ -8,7 +8,6 @@ export default function Siparislerim({ route }) {
   const {cartItems, setCartItems} = useCart(); // burda hatayı çözdük setCartItems ı bunu CartContext.Provider içinde yazdık
   const navigation = useNavigation();
   
-
   useEffect(() => {
     if (route.params?.cartItems) {
       setCartItems(route.params.cartItems);

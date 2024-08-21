@@ -9,8 +9,9 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function Payment({ route }) {
   const { cartItems: initialCartItems} = route.params;
+  const {cartItems, removeFromCart} = useCart();  // delete işlemi için 
   const [currentStep, setCurrentStep] = useState(1);
-  const [cartItems, setCartItems] = useState(initialCartItems); //delete işlemi için 
+
   
   const navigation = useNavigation();
    
@@ -36,7 +37,7 @@ export default function Payment({ route }) {
     console.log('Removing item with ID:', itemId);
     const updatedCartItems = cartItems.filter(item => item.id !== itemId);
     console.log('Updated cart items:', updatedCartItems);
-    setCartItems(updatedCartItems);
+    removeFromCart(itemId);
   };
    // item._id.$oid => ($oid) bu mongo daki ObjectId nin kısaltması oluyor
 
@@ -45,8 +46,6 @@ export default function Payment({ route }) {
 
 // .reduce = JavaScript'te bir dizi (array) üzerinde döngü yaparak her
 // bir öğeyi birleştirip tek bir değere indirgemek için kullanılan bir metottur.
-
-
 
 
   return (

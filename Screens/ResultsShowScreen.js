@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, Platform, ScrollView, ActivityIndicator, Animated, Modal } from 'react-native';
+import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, Platform, ScrollView, ActivityIndicator, Modal } from 'react-native';
 import axios from 'axios';
 import { AntDesign } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -7,12 +7,11 @@ import { useFavorites } from '../context/FavoritesContext';
 import { useNavigation } from '@react-navigation/native';
 import { useCart } from '../context/CartContext';
 
-
 const BASE_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:5000/api/'
   : 'http://localhost:5000/api/';
 
-  export default function ResultsShowScreen({ route }) {
+export default function ResultsShowScreen({ route }) {
   const [sonuc, setSonuc] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const { cartItems, addToCart } = useCart();
@@ -22,8 +21,6 @@ const BASE_URL = Platform.OS === 'android'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
-  const [quantity, setQuantity] = useState(1);
-  const [animatedValue] = useState(new Animated.Value(0));
   const [isCommentPanelVisible, setIsCommentPanelVisible] = useState(false);
   const [comments, setComments] = useState([]);
 
@@ -68,58 +65,11 @@ const BASE_URL = Platform.OS === 'android'
     }
   };
 
-  const animateIcon = () => {
-    animatedValue.setValue(0);
-    Animated.spring(animatedValue, {
-      toValue: 1,
-      friction: 3,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const iconTranslateX = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0],
-  });
-
-  const iconTranslateY = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0],
-  });
-
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <View style={styles.cartContainer}>
-          <Animated.View
-            style={[
-              styles.cartIconContainer,
-              {
-                transform: [
-                  { translateX: iconTranslateX },
-                  { translateY: iconTranslateY }
-                ]
-              }
-            ]}
-          >
-            <Icon
-              name="shopping-cart"
-              size={30}
-              color="red"
-              onPress={() => {
-                navigation.navigate('Siparislerim', { cartItems });
-              }}
-            />
-            {cartItems.length > 0 && (
-              <View style={styles.counterContainer}>
-                <Text style={styles.counterText}>{cartItems.length}</Text>
-              </View>
-            )}
-          </Animated.View>
-        </View>
-      ),
+      headerShown: false,
     });
-  }, [navigation, iconTranslateX, iconTranslateY, cartItems]);
+  }, [navigation, cartItems]);
 
   const getSonuc = async () => {
     if (!id) {
@@ -204,38 +154,37 @@ const BASE_URL = Platform.OS === 'android'
             <View style={styles.headerContainer}>
               <Text style={styles.headerText}>{sonuc.name}</Text>
               <View style={styles.heart}>
-              <TouchableOpacity onPress={toggleFavorite}>
-                <AntDesign name={isFavorite ? "heart" : "hearto"} size={27} color="red"  />
-              </TouchableOpacity>
+                <TouchableOpacity onPress={toggleFavorite}>
+                  <AntDesign name={isFavorite ? "heart" : "hearto"} size={27} color="red" />
+                </TouchableOpacity>
               </View>
-              
             </View>
             <View style={styles.infoContainer}>
-        <View style={styles.infoRow}>
-          <Icon name="phone" size={20} color="red" />
-          <Text style={styles.infoText}>Telefon: {sonuc.phone}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Icon name="star" size={20} color="red" />
-          <Text style={styles.infoText}>Puan: {sonuc.rating}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Icon name="comment" size={20} color="red" />
-          <Text style={styles.infoText}>Yorum Sayısı: {sonuc.review_count}</Text>
-          <TouchableOpacity onPress={handleShowComments}>
-            <Text style={styles.comment}>Yorumları Gör</Text>
-          </TouchableOpacity>
-          <Icon name="comment" size={20} color="red" />
-        </View>
-        <View style={styles.infoRow}>
-          <Icon name="location-on" size={20} color="red" />
-          <Text style={styles.infoText}>Adres: {sonuc.location.display_address.join(', ')}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Icon name="menu" size={20} color="red" />
-          <Text style={styles.infoText}>Menü:</Text>
-        </View>
-      </View>
+              <View style={styles.infoRow}>
+                <Icon name="phone" size={20} color="red" />
+                <Text style={styles.infoText}>Telefon: {sonuc.phone}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Icon name="star" size={20} color="red" />
+                <Text style={styles.infoText}>Puan: {sonuc.rating}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Icon name="comment" size={20} color="red" />
+                <Text style={styles.infoText}>Yorum Sayısı: {sonuc.review_count}</Text>
+                <TouchableOpacity onPress={handleShowComments}>
+                  <Text style={styles.comment}>Yorumları Gör</Text>
+                </TouchableOpacity>
+                <Icon name="comment" size={20} color="red" />
+              </View>
+              <View style={styles.infoRow}>
+                <Icon name="location-on" size={20} color="red" />
+                <Text style={styles.infoText}>Adres: {sonuc.location.display_address.join(', ')}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Icon name="menu" size={20} color="red" />
+                <Text style={styles.infoText}>Menü</Text>
+              </View>
+            </View>
             <ScrollView horizontal style={styles.photosContainer}>
               {photos.map((photo, index) => (
                 <Image key={index} style={styles.image} source={{ uri: photo }} />
@@ -253,6 +202,7 @@ const BASE_URL = Platform.OS === 'android'
                     name: item.name,
                     image: item.image,
                     price: item.price,
+                    product_explain: item.product_explain, // burda ürünün açıklamasını back endden getirdik.
                   });
                 }}
               >
@@ -281,112 +231,151 @@ const BASE_URL = Platform.OS === 'android'
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
-    flex:1,
-    padding: 10,
+    flex: 1,
+    padding: 15,
+    backgroundColor: '#f4f4f4',
   },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    backgroundColor: 'grey',
+    marginTop: 15,
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 4,
   },
   headerText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#ffffff',
   },
   infoContainer: {
-    marginVertical: 10,
+    marginVertical: 15,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: 8,
   },
   infoText: {
-    marginLeft: 5,
-    fontSize: 15,
-    color: '#333', 
-    fontWeight: '600', 
-    lineHeight: 24, 
-    letterSpacing: 0.5, 
-    textTransform: 'capitalize', 
+    marginLeft: 10,  
+  fontSize: 14,    
+  color: '#333',   
+  fontWeight: '700', 
+  lineHeight: 28,  
+  letterSpacing: 1, 
+  fontFamily: 'Arial, sans-serif', 
   },
-  
-
   productList: {
-    marginTop: 20,
+    marginTop: 25,
   },
   productListHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 12,
+    color: '#2c2c2c',
   },
   productItem: {
     flexDirection: 'column',
     alignItems: 'center',
-    marginBottom: 20,
-    marginHorizontal: 10,
+    marginBottom: 25,
+    marginHorizontal: 12,
     flex: 1,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+    padding: 10,
   },
   imageContainer: {
-    position: 'relative', 
-    width: 150,
-    height: 150,
+    position: 'relative',
+    width: 160,
+    height: 160,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   productImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 10,
+    borderRadius: 12,
   },
   icon: {
     position: 'absolute',
-    bottom: 5,
-    right: 5,
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    padding: 5,
+    borderRadius: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
   },
   productName: {
-    marginTop: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginTop: 15,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#333',
   },
   productPrice: {
-    marginTop: 5,
-    fontSize: 14,
-    color: '#888',
+    marginTop: 6,
+    fontSize: 15,
+    color: '#777',
   },
   comment: {
     marginLeft: 100,
     fontSize: 16,
     fontWeight: 'bold',
     marginRight: 10,
+    color: '#1e1e1e',
   },
   modalOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
   modalContainer: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: '#fff',
+    padding: 25,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
     maxHeight: '80%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 10,
   },
   closeButton: {
     alignSelf: 'flex-end',
-    padding: 10,
+    padding: 12,
   },
   closeButtonText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#ff5a5f',
   },
   commentItem: {
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    paddingVertical: 10,
+    borderBottomColor: '#e0e0e0',
+    paddingVertical: 12,
+    color: '#444',
   },
   heart: {
     marginRight: 10,
+    color: '#ff5a5f',
   }
+  
 });
