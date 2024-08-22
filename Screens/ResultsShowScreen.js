@@ -37,14 +37,16 @@ export default function ResultsShowScreen({ route }) {
             <Text style={styles.closeButtonText}>X</Text>
           </TouchableOpacity>
           <FlatList
-            data={comments}
-            renderItem={({ item }) => (
-              <View style={styles.commentItem}>
-                <Text>{item.text}</Text>
+           data={comments}
+           renderItem={({ item }) => (
+           <View style={styles.commentItem}>
+            <Text style={styles.commentAuthor}>{item.author}</Text>
+             <Text style={styles.commentContent}>{item.content}</Text>
+              <Text style={styles.commentDate}>{new Date(item.createdAt).toLocaleString()}</Text>
               </View>
-            )}
-            keyExtractor={(item) => item.id.toString()}
-          />
+              )}
+                keyExtractor={(item, index) => item._id?.toString() || `comment-${index}`}
+/>
         </View>
       </View>
     </Modal>
@@ -52,18 +54,20 @@ export default function ResultsShowScreen({ route }) {
 
   const handleShowComments = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/comments`);
+      const response = await axios.get(`${BASE_URL}comments`);
       if (response.status !== 200) {
         throw new Error('Yorumları getirirken bir sorun oluştu');
       }
+      console.log('Gelen yorumlar:', JSON.stringify(response.data, null, 2));
       setComments(response.data);
+      setIsCommentPanelVisible(true);
     } catch (error) {
       console.error('Yorumları getirirken hata oluştu:', error.message);
       alert('Yorumları getirirken bir sorun oluştu. Lütfen tekrar deneyin.');
-    } finally {
-      setIsCommentPanelVisible(true);
     }
   };
+  
+  
 
   useEffect(() => {
     navigation.setOptions({
@@ -244,7 +248,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 5,
     backgroundColor: 'grey',
-    marginTop: 15,
     marginBottom: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -258,7 +261,17 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   infoContainer: {
-    marginVertical: 15,
+    marginVertical: 20,
+    padding: 20,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 20,
+    borderWidth: 3,
+    borderColor: '#ddd',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
   },
   infoRow: {
     flexDirection: 'row',
@@ -272,7 +285,6 @@ const styles = StyleSheet.create({
   fontWeight: '700', 
   lineHeight: 28,  
   letterSpacing: 1, 
-  fontFamily: 'Arial, sans-serif', 
   },
   productList: {
     marginTop: 25,

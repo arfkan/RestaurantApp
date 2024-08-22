@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#1976D2',
+    backgroundColor: '#ff6347',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 330,
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     width: '50%',
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'crimson',
+    backgroundColor: '#ff6347',
     justifyContent: 'center',
     alignItems: 'center',
     

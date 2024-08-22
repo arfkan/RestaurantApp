@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
 import ProgressBar2 from '../components/ProgressBar2';
 import MapView from 'react-native-maps';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import ModalDropdown from 'react-native-modal-dropdown';
 import { useNavigation } from '@react-navigation/native';
+import { useCart } from '../context/CartContext';
+import LottieView from 'lottie-react-native'; // Lottie animasyonu için gerekli import
 
 const { width, height } = Dimensions.get('window');
 
@@ -12,7 +14,10 @@ export default function LastPayment({ route }) {
   const { cartItems: initialCartItems } = route.params;
   const [currentStep, setCurrentStep] = useState(2);
 
+  const [showAnimation, setShowAnimation] = useState(false);
+
   const navigation = useNavigation();
+  const { clearCart } = useCart(); // ödeme işleminden sonra clear ile sepet sıfırlanmakta.
 
   // ödeme seçeneği için 
   const [selectedPayment, setSelectedPayment] = useState('');
@@ -25,12 +30,20 @@ export default function LastPayment({ route }) {
     { pageNo: 3, title: 'Ödeme' },
   ];
 
-  // burda kredi kartı seçeneği seçilince otomatik olarak bizi sayfaya yönlendirecek
+  // Kredi kartı seçeneği seçilince otomatik olarak bizi sayfaya yönlendirecek
   const handlePaymentSelection = (index, value) => {
     setSelectedPayment(value);
 
     if (value === 'Online Kredi Kartı/Banka Kartı') {
       navigation.navigate('CardInfoScreen');
+    } else if (value === 'Nakit' || value === 'Kapıda Temassız Kartla Ödeme') {
+      setShowAnimation(true);
+
+      setTimeout(() => {
+        setShowAnimation(false);
+        clearCart();
+        navigation.navigate('SearchScreen'); // SearchScreen'e yönlendirme
+      }, 3000); // 3000ms animasyon süresi
     }
   };
 
@@ -76,6 +89,17 @@ export default function LastPayment({ route }) {
           dropdownTextHighlightStyle={styles.dropdownDropdownTextHighlight}
         />
       </View>
+
+      {showAnimation && (
+        <View style={styles.animationContainer}>
+          <LottieView
+            source={require('../assets/animations/delivery-boy (1).json')} 
+            autoPlay
+            loop={false}
+            style={styles.animation}
+          />
+        </View>
+      )}
     </View>
   );
 }
@@ -164,5 +188,26 @@ const styles = StyleSheet.create({
   },
   dropdownDropdownTextHighlight: {
     backgroundColor: '#ffcdd2', 
+  },
+  animationContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -75 }, { translateY: -75 }],
+    width: 150,
+    height: 150,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+  },
+  animation: {
+    width: 300,
+    height: 600,
   },
 });

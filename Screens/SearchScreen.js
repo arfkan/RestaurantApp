@@ -135,24 +135,30 @@ export default function SearchScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.openDrawer()} // Opens the drawer when the menu button is pressed
-          style={styles.menuButton}
-        >
-          <Icon name="menu" size={24} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Siparislerim')} // Navigates to Siparislerim screen
-          style={styles.cartButton}
-        >
-          <Icon name="shopping-cart" size={24} color="black" />
-          {cartItems.length > 0 && (
-            <View style={styles.counterContainer}>
-              <Text style={styles.counterText}>{cartItems.length}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
+  <TouchableOpacity
+    onPress={() => navigation.openDrawer()} // Menü butonuna basıldığında çekmece açılır
+    style={styles.menuButton}
+  >
+    <Icon name="menu" size={24} color="black" />
+  </TouchableOpacity>
+
+  <View style={styles.titleContainer}>
+    <Text style={styles.title}>RestaurantApp</Text>
+  </View>
+
+  <TouchableOpacity
+    onPress={() => navigation.navigate('Siparislerim')} // Siparislerim ekranına gider
+    style={styles.cartButton}
+  >
+    <Icon name="shopping-cart" size={24} color="black" />
+    {cartItems.length > 0 && (
+      <View style={styles.counterContainer}>
+        <Text style={styles.counterText}>{cartItems.length}</Text>
       </View>
+    )}
+  </TouchableOpacity>
+</View>
+
 
       <SearchBar
         term={term}
@@ -191,85 +197,130 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
     paddingTop: 10,
-  },
-  listContainer: {
-    flex: 1,
   },
   restaurantItem: {
     flexDirection: 'row',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'black',
+    padding: 15,
+    marginHorizontal: 10,
+    marginBottom: 15,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   restaurantImage: {
-    width: 75,
-    height: 75,
-    borderRadius: 25,
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    borderColor: '#FF6F61',
+    borderWidth: 2,
   },
   restaurantInfo: {
-    marginLeft: 10,
+    marginLeft: 15,
     justifyContent: 'center',
+    flex: 1,
   },
   restaurantName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#ff6347',
   },
   restaurantPrice: {
-    fontSize: 14,
-    color: 'gray',
+    fontSize: 16,
+    color: '#FF6F61',
+    marginTop: 5,
+    fontWeight: '600',
   },
   errorText: {
-    color: 'red',
+    color: '#FF6F61',
     textAlign: 'center',
     marginTop: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   noDataText: {
     textAlign: 'center',
     marginTop: 10,
-  },
-  speedDialContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
+    fontSize: 16,
+    color: '#BDBDBD',
   },
   titleContainer: {
     marginLeft: 10,
+    flex: 1,
   },
   title: {
-    fontSize: 18,
-    color: 'black',
-    fontWeight: 25,
+    fontSize: 22,
+    color: '#FF6F61',
+    fontWeight: 'bold',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 10,
+    padding: 15,
     backgroundColor: 'white',
-    elevation: 3, // Android için gölge
+    elevation: 10,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   menuButton: {
-    marginLeft: 10,
+    backgroundColor: '#FF6F61',
+    padding: 10,
+    borderRadius: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 8,
   },
   cartButton: {
-    marginRight: 10,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#FF6F61',
+    padding: 10,
+    borderRadius: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 8,
   },
   counterContainer: {
     position: 'absolute',
     top: -10,
     right: -10,
-    backgroundColor: 'red',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
+    backgroundColor: '#FFC107',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 6,
   },
   counterText: {
-    color: 'white',
+    color: '#000',
     fontSize: 12,
     fontWeight: 'bold',
   },
+  titleContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 22,
+    color: '#FF6F61',
+    fontWeight: 'bold',
+  },
+  
 });
+
+
